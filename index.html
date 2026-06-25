@@ -1,528 +1,481 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EventPay — Beautiful Event Contributions</title>
-<meta name="description" content="The most beautiful way to collect and manage event contributions. Wedding, birthday, temple, and more.">
+<script>(function(){ const t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f5c842">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#6366f1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="EventPay — The most beautiful way to collect wedding and event contributions online. Secure, instant, and transparent.">
+<title>EventPay — Beautiful Event Contributions</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
 <style>
 /* ── HERO ── */
 .hero {
-  min-height: calc(100vh - var(--navbar-h));
+  min-height: calc(100vh - 60px);
   display: flex; align-items: center;
-  position: relative; overflow: hidden;
-  padding: 60px 0 80px;
+  background: radial-gradient(ellipse 70% 60% at 65% 40%, rgba(99,102,241,0.08) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 40% at 20% 80%, rgba(139,92,246,0.06) 0%, transparent 60%);
+  padding: 60px 20px 80px; position: relative; overflow: hidden;
 }
-.hero-bg {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(245,200,66,0.06) 0%, transparent 70%),
-              radial-gradient(ellipse 50% 50% at 20% 80%, rgba(255,107,138,0.05) 0%, transparent 60%);
+.hero::before {
+  content:''; position:absolute; width:500px; height:500px; border-radius:50%;
+  background:rgba(99,102,241,0.04); top:-100px; right:-100px; pointer-events:none;
 }
-.hero-content { position: relative; z-index: 1; max-width: 580px; }
+.hero-grid { display:grid; grid-template-columns:1fr 400px; gap:60px; align-items:center; max-width:1100px; margin:0 auto; width:100%; }
+@media(max-width:900px){ .hero-grid{grid-template-columns:1fr;} }
+
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 14px; border-radius: 20px;
-  background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.2);
-  font-size: 12px; font-weight: 700; color: var(--gold);
-  text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 20px;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 14px; border-radius:20px;
+  background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25);
+  color:var(--accent); font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;
 }
 .hero-title {
-  font-family: var(--font-serif);
-  font-size: clamp(38px,7vw,72px);
-  font-weight: 800; line-height: 1.08;
-  margin-bottom: 20px;
+  font-size:clamp(36px,6vw,64px); font-weight:800;
+  line-height:1.08; margin-bottom:18px; letter-spacing:-1px;
 }
 .hero-title em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--gold), var(--rose));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-style:normal;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-.hero-sub { font-size: 17px; color: var(--text-muted); line-height: 1.7; margin-bottom: 36px; max-width: 460px; }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
-.hero-stats { display: flex; gap: 32px; }
-.hero-stat-num { font-size: 26px; font-weight: 800; color: var(--gold); font-family: 'Courier New',monospace; }
-.hero-stat-lbl { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+.hero-sub { font-size:16px; color:var(--text-muted); line-height:1.7; margin-bottom:32px; max-width:460px; }
+.hero-actions { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:48px; }
+@media(max-width:900px){ .hero-actions{justify-content:center;} .hero-title{text-align:center;} .hero-sub{text-align:center;margin:0 auto 32px;} .hero-eyebrow{margin:0 auto 20px;display:flex;width:fit-content;} }
+
+.hero-stats { display:flex; gap:32px; flex-wrap:wrap; }
+@media(max-width:900px){ .hero-stats{justify-content:center;} }
+.hero-stat-num { font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:700; color:var(--accent); }
+.hero-stat-lbl { font-size:11px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
 
 /* ── EVENT ENTRY CARD ── */
 .event-card {
-  position: relative; z-index: 1;
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  box-shadow: var(--shadow-lg);
-  max-width: 420px;
-  margin: 0 auto;
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:22px; padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
 }
-.event-card-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-.event-card-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
-.event-input-wrap { position: relative; }
+.event-card-title { font-size:18px; font-weight:800; margin-bottom:4px; }
+.event-card-sub { font-size:13px; color:var(--text-muted); margin-bottom:22px; }
+.code-input-wrap { position:relative; }
 .event-code-input {
-  width: 100%; padding: 16px 50px 16px 18px;
-  background: var(--surface2); border: 2px solid var(--border);
-  border-radius: var(--radius); color: var(--text);
-  font-family: 'Courier New',monospace; font-size: 18px; font-weight: 700;
-  letter-spacing: 3px; text-transform: uppercase; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  width:100%; padding:16px 50px 16px 18px;
+  background:rgba(0,0,0,0.2); border:2px solid var(--border);
+  border-radius:14px; color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase; outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
 }
-.event-code-input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-glow); }
-.event-code-input::placeholder { letter-spacing: 1px; color: var(--text-dim); font-size: 14px; font-family: var(--font-body); }
-.event-code-go {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  width: 36px; height: 36px; border-radius: var(--radius-sm);
-  background: linear-gradient(135deg,var(--gold),var(--gold2));
-  border: none; color: #0a0e1a; font-size: 18px; font-weight: 700;
-  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+.event-code-input:focus { border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-glow); }
+.event-code-input::placeholder { letter-spacing:1px; color:var(--text-dim); font-size:14px; font-family:'Sora',sans-serif; font-weight:600; }
+.code-go-btn {
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none; color:white; font-size:18px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; justify-content:center;
 }
-.event-code-go:hover { transform: translateY(-50%) scale(1.05); }
-.or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+.code-go-btn:hover { transform:translateY(-50%) scale(1.08); }
+.or-divider { display:flex; align-items:center; gap:10px; margin:16px 0; }
 .or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
-.or-divider span { font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
-.qr-scan-btn {
-  width: 100%; padding: 14px;
-  background: var(--surface2); border: 1.5px dashed var(--border2);
-  border-radius: var(--radius); color: var(--text-muted);
-  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+.or-divider span { font-size:11px; color:var(--text-dim); font-weight:700; text-transform:uppercase; }
+.recent-event-btn {
+  width:100%; padding:14px 16px;
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; cursor:pointer; transition:all 0.2s;
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'Sora',sans-serif;
 }
-.qr-scan-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
-.recent-event { margin-top: 18px; padding: 14px; background: var(--surface2); border-radius: var(--radius-sm); border: 1px solid var(--border); }
-.recent-event-lbl { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.recent-event-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-.recent-event-code { font-size: 11px; color: var(--text-dim); font-family: 'Courier New',monospace; }
+.recent-event-btn:hover { border-color:var(--accent); background:rgba(99,102,241,0.05); }
+.recent-lbl { font-size:10px; color:var(--text-dim); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; margin-bottom:4px; }
+.recent-name { font-size:13px; font-weight:700; }
+.recent-code { font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace; }
 
-/* ── FEATURES GRID ── */
-.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-@media(max-width:900px){ .features-grid { grid-template-columns: 1fr 1fr; } }
-@media(max-width:560px){ .features-grid { grid-template-columns: 1fr; } }
-.feature-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 24px; transition: all 0.2s;
+/* ── FEATURES ── */
+.features-section { padding:80px 20px; }
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:1100px; margin:0 auto; }
+@media(max-width:900px){ .features-grid{grid-template-columns:1fr 1fr;} }
+@media(max-width:560px){ .features-grid{grid-template-columns:1fr;} }
+.feat-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:18px; padding:24px; transition:all 0.2s;
 }
-.feature-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(245,200,66,0.08); }
-.feature-icon { font-size: 32px; margin-bottom: 14px; }
-.feature-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-.feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.feat-card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:0 8px 32px rgba(99,102,241,0.12); }
+.feat-icon { font-size:30px; margin-bottom:12px; }
+.feat-title { font-size:15px; font-weight:800; margin-bottom:8px; }
+.feat-desc { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
-/* ── HOW IT WORKS ── */
-.how-step {
-  display: flex; align-items: flex-start; gap: 20px;
-  padding: 24px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); transition: border-color 0.2s;
+/* ── STEPS ── */
+.steps-section { padding:80px 20px; background:var(--surface); }
+.steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:1000px; margin:0 auto; }
+@media(max-width:700px){ .steps-grid{grid-template-columns:1fr;} }
+.step-card { padding:24px; text-align:center; }
+.step-num {
+  width:50px; height:50px; border-radius:14px; margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white; font-size:20px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
 }
-.how-step:hover { border-color: var(--border2); }
-.how-num {
-  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-  background: linear-gradient(135deg,var(--gold),var(--gold2));
-  color: #0a0e1a; font-size: 18px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-}
-.how-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
-.how-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.step-title { font-size:16px; font-weight:800; margin-bottom:8px; }
+.step-desc { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
 /* ── EVENT TYPES ── */
-.event-types-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
-@media(max-width:768px){ .event-types-grid { grid-template-columns: repeat(3,1fr); } }
-@media(max-width:480px){ .event-types-grid { grid-template-columns: repeat(2,1fr); } }
-.event-type-card {
-  padding: 20px 12px; border-radius: var(--radius); text-align: center;
-  background: var(--surface); border: 1.5px solid var(--border);
-  cursor: pointer; transition: all 0.2s;
+.types-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; max-width:900px; margin:0 auto; }
+@media(max-width:768px){ .types-grid{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:480px){ .types-grid{grid-template-columns:repeat(2,1fr);} }
+.type-card {
+  padding:20px 12px; border-radius:16px; text-align:center;
+  background:var(--surface); border:1.5px solid var(--border);
+  cursor:pointer; transition:all 0.2s;
 }
-.event-type-card:hover { border-color: var(--gold); transform: translateY(-3px); }
-.event-type-icon { font-size: 32px; margin-bottom: 8px; }
-.event-type-name { font-size: 13px; font-weight: 700; }
+.type-card:hover { border-color:var(--accent); transform:translateY(-3px); background:rgba(99,102,241,0.05); }
+.type-icon { font-size:30px; margin-bottom:8px; }
+.type-name { font-size:13px; font-weight:700; }
 
 /* ── TESTIMONIALS ── */
+.testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:1100px; margin:0 auto; }
+@media(max-width:768px){ .testi-grid{grid-template-columns:1fr;} }
 .testi-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 24px;
-  position: relative;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:18px; padding:24px;
 }
-.testi-quote { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-.testi-author { display: flex; align-items: center; gap: 10px; }
+.testi-quote { font-size:14px; color:var(--text-muted); line-height:1.7; margin-bottom:16px; font-style:italic; }
+.testi-author { display:flex; align-items:center; gap:10px; }
 .testi-avatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: linear-gradient(135deg,var(--gold),var(--rose));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 800; color: #0a0e1a; flex-shrink: 0;
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; font-weight:800; color:white; flex-shrink:0;
 }
-.testi-name { font-size: 13px; font-weight: 700; }
-.testi-role { font-size: 11px; color: var(--text-dim); }
+.testi-name { font-size:13px; font-weight:700; }
+.testi-role { font-size:11px; color:var(--text-dim); }
 
-/* ── HERO LAYOUT ── */
-.hero-inner { display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: center; }
-@media(max-width:900px){ .hero-inner { grid-template-columns: 1fr; } }
-@media(max-width:900px){ .hero-content { text-align: center; } }
-@media(max-width:900px){ .hero-actions { justify-content: center; } }
-@media(max-width:900px){ .hero-stats { justify-content: center; } }
-
-/* ── CTA BANNER ── */
+/* ── CTA ── */
 .cta-banner {
-  background: linear-gradient(135deg, rgba(245,200,66,0.1), rgba(255,107,138,0.08));
-  border: 1px solid rgba(245,200,66,0.2); border-radius: var(--radius-lg);
-  padding: 48px 40px; text-align: center;
+  background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.08));
+  border:1px solid rgba(99,102,241,0.2); border-radius:24px;
+  padding:52px 40px; text-align:center; max-width:860px; margin:0 auto;
 }
+.section-eyebrow {
+  display:inline-flex; align-items:center; gap:6px; padding:5px 14px;
+  border-radius:20px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25);
+  color:var(--accent); font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:1px; margin-bottom:16px;
+}
+.section-title { font-size:clamp(22px,4vw,36px); font-weight:800; margin-bottom:12px; }
+.section-sub { font-size:15px; color:var(--text-muted); max-width:500px; margin:0 auto 32px; line-height:1.7; }
+
+/* ── FOOTER ── */
+.footer {
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:48px 20px 24px;
+}
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; max-width:1100px; margin:0 auto 32px; }
+@media(max-width:768px){ .footer-grid{grid-template-columns:1fr 1fr;gap:24px;} }
+@media(max-width:480px){ .footer-grid{grid-template-columns:1fr;} }
+.footer-brand { font-size:20px; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:10px; }
+.footer-desc { font-size:13px; color:var(--text-dim); line-height:1.7; margin-bottom:14px; }
+.footer-col-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:12px; }
+.footer-links { display:flex; flex-direction:column; gap:8px; }
+.footer-links a { font-size:13px; color:var(--text-dim); text-decoration:none; transition:color 0.2s; }
+.footer-links a:hover { color:var(--accent); }
+.footer-bottom { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-top:20px; border-top:1px solid var(--border); max-width:1100px; margin:0 auto; }
+.footer-bottom p { font-size:12px; color:var(--text-dim); }
+
+/* ── BADGE ── */
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; }
+.badge-purple { background:rgba(99,102,241,0.12); color:var(--accent); border:1px solid rgba(99,102,241,0.25); }
+.badge-green  { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); }
+.badge-blue   { background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); }
+
+.btn-hero-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 28px; border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white; border:none; font-family:'Sora',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer; transition:all 0.3s; text-decoration:none;
+}
+.btn-hero-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px var(--accent-glow); }
+.btn-hero-ghost {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 28px; border-radius:14px;
+  background:transparent; color:var(--text);
+  border:1.5px solid var(--border2); font-family:'Sora',sans-serif;
+  font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; text-decoration:none;
+}
+.btn-hero-ghost:hover { border-color:var(--accent); color:var(--accent); background:rgba(99,102,241,0.06); }
+
+/* animations */
+@keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.anim-1 { animation:fadeInUp 0.6s ease both; }
+.anim-2 { animation:fadeInUp 0.6s 0.12s ease both; }
+.anim-3 { animation:fadeInUp 0.6s 0.22s ease both; }
 </style>
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
 <nav class="navbar">
-  <a href="index.html" class="nav-brand">
-    <div class="brand-icon">💛</div>
-    EventPay
-  </a>
+  <div class="nav-logo" id="navLogo">💛 EventPay</div>
   <div class="nav-links">
     <a href="index.html" class="nav-link active">Home</a>
-    <a href="request.html" class="nav-link">Request Event</a>
-    <a href="complaints.html" class="nav-link">Support</a>
+    <a href="donors.html" class="nav-link">Donors</a>
+    <a href="status.html" class="nav-link">Check Status</a>
+    <a href="complaint.html" class="nav-link">Support</a>
     <a href="contact.html" class="nav-link">Contact</a>
+    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+    <a href="admin-login.html" class="nav-link admin-link">⚡ Admin</a>
   </div>
-  <div class="nav-right">
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
-    <a href="admin-login.html" class="nav-cta">Admin</a>
-    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
-  </div>
+  <button class="hamburger" onclick="toggleNav()">☰</button>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
+<div class="nav-mobile" id="navMobile">
   <a href="index.html">🏠 Home</a>
-  <a href="request.html">🎉 Request Event</a>
-  <a href="complaints.html">💬 Support</a>
+  <a href="donors.html">👥 Donors</a>
+  <a href="status.html">🔍 Check Status</a>
+  <a href="complaint.html">💬 Support</a>
   <a href="contact.html">📞 Contact</a>
-  <a href="privacy.html">🔒 Privacy</a>
-  <a href="admin-login.html">⚡ Admin</a>
+  <a href="privacy_policy.html">🔒 Privacy</a>
+  <a href="terms.html">📄 Terms</a>
+  <a href="admin-login.html">⚡ Admin Login</a>
 </div>
 
-<!-- ══════════════════════ HERO ══════════════════════ -->
-<div class="page-wrap">
+<!-- ════════════════ HERO ════════════════ -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="container">
-    <div class="hero-inner">
-      <div class="hero-content reveal">
-        <div class="hero-eyebrow">✨ Trusted by 500+ events</div>
-        <h1 class="hero-title">
-          The most<br><em>beautiful way</em><br>to collect gifts
-        </h1>
-        <p class="hero-sub">
-          Share a link or QR code. Guests contribute instantly with Razorpay.
-          You see every payment in real time — beautifully organized.
-        </p>
-        <div class="hero-actions">
-          <a href="request.html" class="btn btn-gold btn-lg">🎉 Create Your Event</a>
-          <a href="#how" class="btn btn-ghost btn-lg">How it works ↓</a>
-        </div>
-        <div class="hero-stats">
-          <div>
-            <div class="hero-stat-num">₹4.2Cr</div>
-            <div class="hero-stat-lbl">Collected</div>
-          </div>
-          <div>
-            <div class="hero-stat-num">500+</div>
-            <div class="hero-stat-lbl">Events</div>
-          </div>
-          <div>
-            <div class="hero-stat-num">28K+</div>
-            <div class="hero-stat-lbl">Contributors</div>
-          </div>
-        </div>
+  <div class="hero-grid">
+    <!-- LEFT: CONTENT -->
+    <div class="anim-1">
+      <div class="hero-eyebrow">✨ Trusted by 500+ events</div>
+      <h1 class="hero-title">The most<br><em>beautiful way</em><br>to collect gifts</h1>
+      <p class="hero-sub">Share a link or QR code. Guests contribute instantly via UPI. You see every payment in real time — beautifully organized and secure.</p>
+      <div class="hero-actions">
+        <a href="#contribute" class="btn-hero-primary">💛 Contribute Now</a>
+        <a href="#how" class="btn-hero-ghost">How it works ↓</a>
       </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-num" id="statTotal">₹—</div><div class="hero-stat-lbl">Collected</div></div>
+        <div><div class="hero-stat-num" id="statCount">—</div><div class="hero-stat-lbl">Contributors</div></div>
+        <div><div class="hero-stat-num" id="statPending">—</div><div class="hero-stat-lbl">Pending</div></div>
+      </div>
+    </div>
 
-      <!-- EVENT ENTRY CARD -->
-      <div class="reveal" style="animation-delay:0.15s">
-        <div class="event-card">
-          <div class="event-card-title">Open an Event</div>
-          <div class="event-card-sub">Enter the event code shared by the organizer</div>
+    <!-- RIGHT: EVENT CARD (contribution CTA) -->
+    <div class="anim-2" id="contribute">
+      <div class="event-card">
+        <div class="event-card-title" id="eventName">💛 Wedding Contribution</div>
+        <div class="event-card-sub" id="eventSub">Your gift means everything to the couple</div>
 
-          <div class="event-input-wrap">
-            <input class="event-code-input" id="eventCodeInput" placeholder="e.g. WED25001" maxlength="10"
-              oninput="this.value=this.value.toUpperCase()"
-              onkeydown="if(event.key==='Enter')goToEvent()">
-            <button class="event-code-go" onclick="goToEvent()">→</button>
-          </div>
+        <a href="index.html" class="btn-hero-primary" style="width:100%;justify-content:center;margin-bottom:16px;font-size:16px;padding:16px">
+          💛 Contribute Now
+        </a>
 
-          <div class="or-divider"><span>or</span></div>
+        <div class="or-divider"><span>or</span></div>
 
-          <button class="qr-scan-btn" onclick="openQRScanner()">
-            <span>📷</span> Scan QR Code
-          </button>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="status.html" class="recent-event-btn" style="text-decoration:none;color:inherit">
+            <div><div class="recent-lbl">Track your payment</div><div class="recent-name">Check contribution status</div></div>
+            <span style="color:var(--text-muted)">→</span>
+          </a>
+          <a href="donors.html" class="recent-event-btn" style="text-decoration:none;color:inherit">
+            <div><div class="recent-lbl">See who contributed</div><div class="recent-name">View donor list</div></div>
+            <span style="color:var(--text-muted)">→</span>
+          </a>
+        </div>
 
-          <div id="recentEventWrap" style="display:none">
-            <div class="recent-event" id="recentEvent">
-              <div class="recent-event-lbl">Last visited</div>
-              <div class="recent-event-name" id="recentEventName">—</div>
-              <div class="recent-event-code" id="recentEventCode">—</div>
-            </div>
-            <button class="btn btn-surface btn-block mt-4" onclick="openLastEvent()">
-              Open Last Event →
-            </button>
-          </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;">
+          <div style="font-size:11px;font-weight:700;color:#34d399;margin-bottom:4px">🔒 Secure & Transparent</div>
+          <div style="font-size:11px;color:var(--text-muted)">Your payment is recorded instantly and visible publicly. All transactions are audited.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════ EVENT TYPES ══════════════════════ -->
-<section class="section-sm">
-  <div class="container">
-    <div class="text-center mb-6 reveal">
-      <div class="section-eyebrow">Every occasion</div>
-      <h2 class="heading-1">What kind of event?</h2>
+<!-- ════════════════ EVENT TYPES ════════════════ -->
+<section style="padding:60px 20px;text-align:center;">
+  <div class="section-eyebrow">Every occasion</div>
+  <h2 class="section-title">Perfect for any celebration</h2>
+  <div class="types-grid" style="margin-top:28px">
+    <div class="type-card"><div class="type-icon">💒</div><div class="type-name">Wedding</div></div>
+    <div class="type-card"><div class="type-icon">🎂</div><div class="type-name">Birthday</div></div>
+    <div class="type-card"><div class="type-icon">🛕</div><div class="type-name">Temple</div></div>
+    <div class="type-card"><div class="type-icon">🏠</div><div class="type-name">Housewarming</div></div>
+    <div class="type-card"><div class="type-icon">🎊</div><div class="type-name">Other</div></div>
+  </div>
+</section>
+
+<!-- ════════════════ HOW IT WORKS ════════════════ -->
+<section class="steps-section" id="how">
+  <div style="text-align:center;margin-bottom:40px">
+    <div class="section-eyebrow">Simple process</div>
+    <h2 class="section-title">Up and running in seconds</h2>
+    <p class="section-sub">No app download, no account needed. Just a link.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-title">Open the link</div>
+      <div class="step-desc">The organizer shares a unique link or QR code. Scan or click to open the contribution page instantly.</div>
     </div>
-    <div class="event-types-grid reveal">
-      <div class="event-type-card" onclick="location.href='request.html?type=WED'">
-        <div class="event-type-icon">💒</div>
-        <div class="event-type-name">Wedding</div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-title">Enter your details</div>
+      <div class="step-desc">Enter your name, village, and the amount you'd like to gift. Takes under a minute.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-title">Pay instantly</div>
+      <div class="step-desc">Pay via UPI. Your payment is recorded immediately and visible in the donor list.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ FEATURES ════════════════ -->
+<section class="features-section">
+  <div style="text-align:center;margin-bottom:40px;max-width:1100px;margin-left:auto;margin-right:auto">
+    <div class="section-eyebrow">Everything you need</div>
+    <h2 class="section-title">Built for organizers</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Instant UPI Payments</div><div class="feat-desc">UPI QR code generated instantly. Works with GPay, PhonePe, Paytm, and every UPI app.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Live Analytics</div><div class="feat-desc">See village-wise, donor-wise breakdowns in real time. Charts that actually make sense.</div></div>
+    <div class="feat-card"><div class="feat-icon">🔐</div><div class="feat-title">Bank-grade Security</div><div class="feat-desc">All data in Google Sheets. No public access to your payment data. Every action audited.</div></div>
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Mobile First</div><div class="feat-desc">Works perfectly on any device. Guests contribute in under 30 seconds.</div></div>
+    <div class="feat-card"><div class="feat-icon">📸</div><div class="feat-title">Beautiful Gallery</div><div class="feat-desc">Upload event photos. Share memories with guests. Downloads controlled by admin.</div></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Fraud Detection</div><div class="feat-desc">Automatic duplicate detection and risk scoring on every payment. Admins approve high-risk entries.</div></div>
+  </div>
+</section>
+
+<!-- ════════════════ TESTIMONIALS ════════════════ -->
+<section style="padding:80px 20px;background:var(--surface);">
+  <div style="text-align:center;margin-bottom:40px">
+    <div class="section-eyebrow">Loved by organizers</div>
+    <h2 class="section-title">What they say</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-quote">"Collected ₹8.4 lakh for our daughter's wedding in 3 days. Every guest found it easy to pay. Highly recommended!"</div>
+      <div class="testi-author">
+        <div class="testi-avatar">R</div>
+        <div><div class="testi-name">Ramesh Kumar</div><div class="testi-role">Wedding Organizer, Silchar</div></div>
       </div>
-      <div class="event-type-card" onclick="location.href='request.html?type=BD'">
-        <div class="event-type-icon">🎂</div>
-        <div class="event-type-name">Birthday</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"Used for our temple's annual festival. The village-wise breakdown helped us understand where support came from."</div>
+      <div class="testi-author">
+        <div class="testi-avatar">S</div>
+        <div><div class="testi-name">Suresh Dey</div><div class="testi-role">Temple Committee, Cachar</div></div>
       </div>
-      <div class="event-type-card" onclick="location.href='request.html?type=TEMP'">
-        <div class="event-type-icon">🛕</div>
-        <div class="event-type-name">Temple</div>
-      </div>
-      <div class="event-type-card" onclick="location.href='request.html?type=HW'">
-        <div class="event-type-icon">🏠</div>
-        <div class="event-type-name">Housewarming</div>
-      </div>
-      <div class="event-type-card" onclick="location.href='request.html?type=OTH'">
-        <div class="event-type-icon">🎊</div>
-        <div class="event-type-name">Other</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"The QR code on the invitation card was genius. Guests scanned and paid instantly. No confusion, no cash handling."</div>
+      <div class="testi-author">
+        <div class="testi-avatar">P</div>
+        <div><div class="testi-name">Priya Das</div><div class="testi-role">Birthday Organizer</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════ HOW IT WORKS ══════════════════════ -->
-<section class="section" id="how">
-  <div class="container">
-    <div class="text-center mb-6 reveal">
-      <div class="section-eyebrow">Simple process</div>
-      <h2 class="heading-1">Up and running in minutes</h2>
-      <p class="subtext mt-4">No technical skills required. We handle everything.</p>
-    </div>
-    <div class="grid-3 reveal">
-      <div class="how-step">
-        <div class="how-num">1</div>
-        <div>
-          <div class="how-title">Request your event</div>
-          <div class="how-desc">Fill a simple form with your event details. We review and approve within 24 hours.</div>
-        </div>
-      </div>
-      <div class="how-step">
-        <div class="how-num">2</div>
-        <div>
-          <div class="how-title">Share your link</div>
-          <div class="how-desc">You get a unique event code and QR. Share it on WhatsApp, invitations, or anywhere.</div>
-        </div>
-      </div>
-      <div class="how-step">
-        <div class="how-num">3</div>
-        <div>
-          <div class="how-title">Collect & track</div>
-          <div class="how-desc">Guests pay instantly via Razorpay. Watch contributions appear in real time on your dashboard.</div>
-        </div>
-      </div>
+<!-- ════════════════ CTA ════════════════ -->
+<section style="padding:80px 20px;">
+  <div class="cta-banner">
+    <div class="section-eyebrow">Get started today</div>
+    <h2 class="section-title">Ready to contribute?</h2>
+    <p class="section-sub">Secure, transparent, and instant. Your contribution goes directly to the organizer.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="index.html" class="btn-hero-primary">💛 Contribute Now</a>
+      <a href="contact.html" class="btn-hero-ghost">Talk to us</a>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════ FEATURES ══════════════════════ -->
-<section class="section" style="background:var(--bg2)">
-  <div class="container">
-    <div class="text-center mb-6 reveal">
-      <div class="section-eyebrow">Everything you need</div>
-      <h2 class="heading-1">Built for organizers</h2>
-    </div>
-    <div class="features-grid reveal">
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <div class="feature-title">Instant Payments</div>
-        <div class="feature-desc">Razorpay integration — UPI, cards, netbanking, wallets. Every method supported.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <div class="feature-title">Live Analytics</div>
-        <div class="feature-desc">See village-wise, donor-wise breakdowns in real time. Charts that make sense.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔐</div>
-        <div class="feature-title">Bank-grade Security</div>
-        <div class="feature-desc">All data in Google Sheets. No shared access. Every action fully audited.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
-        <div class="feature-title">Mobile First</div>
-        <div class="feature-desc">Works perfectly on any device. Guests can contribute in under 30 seconds.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🎨</div>
-        <div class="feature-title">Beautiful Gallery</div>
-        <div class="feature-desc">Upload event photos and videos. Share memories, enable downloads per your choice.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📧</div>
-        <div class="feature-title">Auto Receipts</div>
-        <div class="feature-desc">Email and PDF receipts sent automatically after every payment.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ TESTIMONIALS ══════════════════════ -->
-<section class="section">
-  <div class="container">
-    <div class="text-center mb-6 reveal">
-      <div class="section-eyebrow">Loved by organizers</div>
-      <h2 class="heading-1">What they say</h2>
-    </div>
-    <div class="grid-3 reveal">
-      <div class="testi-card">
-        <div class="testi-quote">"Collected ₹8.4 lakh for our daughter's wedding in 3 days. Every guest found it easy to pay. Highly recommended."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">R</div>
-          <div><div class="testi-name">Ramesh Kumar</div><div class="testi-role">Wedding Organizer, Silchar</div></div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-quote">"Used for our temple's annual festival. The village-wise breakdown helped us understand where support came from."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">S</div>
-          <div><div class="testi-name">Suresh Dey</div><div class="testi-role">Temple Committee, Cachar</div></div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-quote">"The QR code on the invitation card was genius. Guests scanned and paid instantly. No confusion, no cash."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">P</div>
-          <div><div class="testi-name">Priya Das</div><div class="testi-role">Birthday Organizer</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ CTA ══════════════════════ -->
-<section class="section-sm">
-  <div class="container reveal">
-    <div class="cta-banner">
-      <div class="section-eyebrow" style="margin:0 auto 16px">Get started today</div>
-      <h2 class="heading-1 mb-4">Ready to create your event?</h2>
-      <p class="subtext mb-6" style="max-width:480px;margin:0 auto 24px">Free to request. No hidden fees. No setup charges. Just your event, beautifully presented.</p>
-      <div class="flex gap-4" style="justify-content:center;flex-wrap:wrap">
-        <a href="request.html" class="btn btn-gold btn-lg">🎉 Request Free Event</a>
-        <a href="contact.html" class="btn btn-ghost btn-lg">Talk to us</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<!-- ════════════════ FOOTER ════════════════ -->
 <footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand">💛 EventPay</div>
-        <div class="footer-desc">The most beautiful event contribution platform. Trusted by hundreds of organizers across India.</div>
-        <div class="flex gap-4" style="flex-wrap:wrap">
-          <span class="badge badge-gold">PWA</span>
-          <span class="badge badge-teal">Razorpay</span>
-          <span class="badge badge-blue">Secure</span>
-        </div>
-      </div>
-      <div>
-        <div class="footer-col-title">Platform</div>
-        <div class="footer-links">
-          <a href="request.html">Request Event</a>
-          <a href="complaints.html">Support</a>
-          <a href="contact.html">Contact Us</a>
-          <a href="admin-login.html">Admin Login</a>
-        </div>
-      </div>
-      <div>
-        <div class="footer-col-title">Legal</div>
-        <div class="footer-links">
-          <a href="privacy.html">Privacy Policy</a>
-          <a href="terms.html">Terms of Service</a>
-          <a href="refund.html">Refund Policy</a>
-        </div>
-      </div>
-      <div>
-        <div class="footer-col-title">Support</div>
-        <div class="footer-links">
-          <a href="contact.html">Help Center</a>
-          <a href="complaints.html">File Complaint</a>
-          <a href="mailto:support@eventpay.in">Email Us</a>
-        </div>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">💛 EventPay</div>
+      <div class="footer-desc">The most beautiful event contribution platform. Secure, transparent, and instant payments for every celebration.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-purple">PWA</span>
+        <span class="badge badge-green">Secure</span>
+        <span class="badge badge-blue">UPI</span>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p>© 2025 EventPay. All rights reserved.</p>
-      <p>Made with 💛 for event organizers</p>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="donors.html">Donor List</a>
+        <a href="status.html">Check Status</a>
+        <a href="complaint.html">Support</a>
+      </div>
     </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="privacy_policy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="refund.html">Refund Policy</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <div class="footer-links">
+        <a href="contact.html">Contact Us</a>
+        <a href="complaint.html">File Complaint</a>
+        <a href="admin-login.html">Admin Login</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 EventPay. All rights reserved.</p>
+    <p>Made with 💛 for event organizers in India</p>
   </div>
 </footer>
-</div><!-- /page-wrap -->
-
-<!-- QR SCANNER MODAL -->
-<div class="modal-overlay" id="qrModal" onclick="closeModalOnBg(event,'qrModal')">
-  <div class="modal-box" style="max-width:400px;text-align:center">
-    <div class="modal-header">
-      <div class="modal-title">📷 Scan QR Code</div>
-      <button class="modal-close" onclick="closeModal('qrModal')">✕</button>
-    </div>
-    <div id="qrReaderWrap" style="background:var(--surface2);border-radius:var(--radius);height:240px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
-      <div style="text-align:center;color:var(--text-dim)">
-        <div style="font-size:48px;margin-bottom:8px">📱</div>
-        <div style="font-size:13px">QR scanning requires camera permission</div>
-        <div style="font-size:11px;margin-top:4px">Use the event code instead if camera is unavailable</div>
-      </div>
-    </div>
-    <p style="font-size:13px;color:var(--text-muted)">Point your camera at the event QR code</p>
-  </div>
-</div>
 
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="app.js"></script>
+<script src="config.js"></script>
 <script>
-// Last event from localStorage
-const lastCode = localStorage.getItem(EP.LS.LAST_EVENT);
-if (lastCode) {
-  document.getElementById("recentEventWrap").style.display = "block";
-  document.getElementById("recentEventCode").textContent = lastCode;
-  // Try to get event name
-  api("getEventName", { code: lastCode }).then(d => {
-    if (d.name) document.getElementById("recentEventName").textContent = d.name;
-    else document.getElementById("recentEventName").textContent = lastCode;
-  }).catch(() => {
-    document.getElementById("recentEventName").textContent = lastCode;
-  });
-}
+// Load public stats
+fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats")
+  .then(r => r.json())
+  .then(d => {
+    if (d.total) document.getElementById("statTotal").textContent = "₹" + Number(d.total).toLocaleString("en-IN");
+    if (d.count) document.getElementById("statCount").textContent = d.count;
+    if (d.pending !== undefined) document.getElementById("statPending").textContent = d.pending;
+  }).catch(() => {});
 
-function goToEvent() {
-  const code = document.getElementById("eventCodeInput").value.trim().toUpperCase();
-  if (!code || code.length < 5) { toast("Please enter a valid event code (e.g. WED25001)", "warning"); return; }
-  setEventCode(code);
-  location.href = "event.html?event=" + code;
-}
+// Load settings for event name
+fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings")
+  .then(r => r.json())
+  .then(s => {
+    const name = s.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
+    document.getElementById("navLogo").textContent = "💛 " + name;
+    document.getElementById("eventName").textContent = "💛 " + name;
+    document.title = name + " — Event Contribution";
+    if (s.BrideName && s.GroomName) {
+      document.getElementById("eventSub").textContent = s.BrideName + " & " + s.GroomName + " — " + (s.EventDate || "");
+    }
+  }).catch(() => {});
 
-function openLastEvent() {
-  if (lastCode) {
-    location.href = "event.html?event=" + lastCode;
-  }
+function toggleNav() { document.getElementById("navMobile").classList.toggle("open"); }
+function toggleTheme() {
+  const c = document.documentElement.getAttribute('data-theme') || 'dark', n = c === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', n); localStorage.setItem('theme', n);
+  document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️ Light' : '🌙 Dark';
 }
-
-function openQRScanner() {
-  openModal("qrModal");
+window.addEventListener('DOMContentLoaded', () => {
+  const t = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+});
+function toast(msg, type = "info") {
+  const tc = document.getElementById("toastContainer"), t = document.createElement("div");
+  t.className = "toast " + type; t.textContent = msg; tc.appendChild(t);
+  setTimeout(() => { t.classList.add("fade-out"); setTimeout(() => t.remove(), 300); }, 3500);
 }
 </script>
+<script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </body>
 </html>
