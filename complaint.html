@@ -6,97 +6,80 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#6366f1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="EventPay Support — Submit a complaint, track status, or get help with your payment.">
-<title>Support & Complaints — EventPay</title>
+<title>Support — EventPay</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
-.page-hero { background:linear-gradient(135deg,#1e1b4b,#312e81); padding:44px 20px; text-align:center; border-bottom:1px solid var(--border); }
+.page-hero { background:linear-gradient(135deg,#1e1b4b,#312e81); padding:40px 20px; text-align:center; border-bottom:1px solid var(--border); }
 [data-theme="light"] .page-hero { background:linear-gradient(135deg,#4f46e5,#7c3aed); }
-.page-hero h1 { font-size:clamp(22px,4vw,34px); font-weight:800; color:#fff; margin-bottom:8px; }
-.page-hero p  { color:rgba(255,255,255,0.78); font-size:14px; max-width:520px; margin:0 auto; line-height:1.6; }
+.page-hero h1 { font-size:clamp(20px,4vw,30px); font-weight:800; color:#fff; margin-bottom:6px; }
+.page-hero p  { color:rgba(255,255,255,0.78); font-size:13px; }
 
-.complaint-layout { display:grid; grid-template-columns:1fr 360px; gap:28px; max-width:1000px; margin:0 auto; padding:32px 20px 64px; }
-@media(max-width:840px){ .complaint-layout{grid-template-columns:1fr;} }
+.layout { display:grid; grid-template-columns:1fr 320px; gap:24px; max-width:900px; margin:0 auto; }
+@media(max-width:760px){ .layout { grid-template-columns:1fr; } }
 
-/* TOPIC GRID */
-.topics-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
-@media(max-width:520px){ .topics-grid{grid-template-columns:1fr;} }
-.topic-card {
-  padding:14px; border-radius:12px; cursor:pointer;
-  background:var(--surface); border:1.5px solid var(--border);
-  transition:all 0.2s; display:flex; align-items:flex-start; gap:10px;
-}
-.topic-card:hover, .topic-card.selected { border-color:var(--accent); background:rgba(99,102,241,0.06); }
+/* TOPIC CARDS */
+.topics-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+@media(max-width:480px){ .topics-grid{grid-template-columns:1fr;} }
+.topic-card { padding:12px; border-radius:12px; cursor:pointer; background:var(--surface); border:1.5px solid var(--border); transition:all 0.2s; display:flex; align-items:flex-start; gap:10px; }
+.topic-card:hover,.topic-card.selected { border-color:var(--accent); background:rgba(99,102,241,0.06); }
 .topic-card.selected { box-shadow:0 0 0 3px var(--accent-glow); }
-.topic-icon { font-size:20px; flex-shrink:0; }
-.topic-title { font-size:13px; font-weight:700; margin-bottom:2px; }
-.topic-desc { font-size:11px; color:var(--text-muted); }
+.topic-icon { font-size:18px; flex-shrink:0; }
+.topic-title { font-size:12px; font-weight:700; margin-bottom:1px; }
+.topic-desc { font-size:10px; color:var(--text-muted); }
 
 /* FILE UPLOAD */
-.upload-area {
-  border:2px dashed var(--border2); border-radius:12px;
-  padding:24px; text-align:center; cursor:pointer; transition:all 0.2s;
-  background:var(--surface);
-}
-.upload-area:hover, .upload-area.drag-over { border-color:var(--accent); background:rgba(99,102,241,0.05); }
-.upload-area input[type=file] { display:none; }
+.upload-zone { border:2px dashed var(--border2); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--surface2); position:relative; }
+.upload-zone:hover,.upload-zone.drag-over { border-color:var(--accent); background:rgba(99,102,241,0.05); }
+.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.file-chosen { margin-top:8px; padding:8px 12px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:8px; font-size:12px; color:#34d399; display:none; }
+.file-chosen.show { display:flex; align-items:center; gap:8px; }
 
-/* SIDEBAR */
-.sidebar-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:16px; }
-.sidebar-card h3 { font-size:14px; font-weight:800; margin-bottom:14px; }
-.info-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; }
-.info-row:last-child { border-bottom:none; }
-.info-row-icon { font-size:18px; flex-shrink:0; }
-.info-row-label { font-weight:700; font-size:12px; margin-bottom:2px; }
-.info-row-value { color:var(--text-muted); font-size:12px; }
-
-/* FAQ */
+/* FAQ sidebar */
+.sidebar-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:14px; }
+.sidebar-card h3 { font-size:13px; font-weight:800; margin-bottom:14px; color:var(--text); }
 .faq-item { border-bottom:1px solid var(--border); }
-.faq-q {
-  width:100%; padding:14px 0; text-align:left;
-  background:none; border:none; color:var(--text); font-family:'Sora',sans-serif;
-  font-size:13px; font-weight:600; cursor:pointer;
-  display:flex; justify-content:space-between; align-items:center; gap:12px; transition:color 0.2s;
-}
+.faq-q { width:100%; padding:11px 0; text-align:left; background:none; border:none; color:var(--text); font-family:'Sora',sans-serif; font-size:12px; font-weight:600; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px; transition:color 0.2s; }
 .faq-q:hover { color:var(--accent); }
-.faq-chevron { font-size:16px; flex-shrink:0; transition:transform 0.3s; color:var(--text-muted); }
+.faq-chevron { font-size:14px; flex-shrink:0; transition:transform 0.3s; color:var(--text-muted); }
 .faq-item.open .faq-chevron { transform:rotate(180deg); }
-.faq-a { display:none; padding-bottom:14px; font-size:13px; color:var(--text-muted); line-height:1.7; }
+.faq-a { display:none; padding-bottom:12px; font-size:12px; color:var(--text-muted); line-height:1.7; }
 .faq-item.open .faq-a { display:block; }
 
-/* TRACK RESULT */
-.track-result { background:var(--surface2); border-radius:10px; padding:14px; margin-top:12px; }
+.info-row { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.info-row:last-child { border-bottom:none; }
+.info-icon { font-size:16px; flex-shrink:0; }
+.info-label { font-weight:700; font-size:11px; margin-bottom:1px; color:var(--text); }
+.info-value { color:var(--text-muted); font-size:11px; }
+
+/* TRACK */
+.track-result { background:var(--surface2); border-radius:10px; padding:12px; margin-top:10px; font-size:12px; color:var(--text-muted); }
 
 /* SUCCESS */
-.success-screen { text-align:center; padding:48px 20px; }
-.success-icon { width:76px; height:76px; border-radius:50%; background:rgba(16,185,129,0.1); border:3px solid #34d399; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:32px; }
+.success-screen { text-align:center; padding:40px 20px; }
+.success-icon { font-size:64px; margin-bottom:16px; }
 
-/* STATUS BADGES */
-.badge { display:inline-flex; align-items:center; gap:3px; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; }
-.badge-open { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); }
-.badge-progress { background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-.badge-resolved { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
-.badge-closed { background:rgba(100,116,139,0.12); color:#94a3b8; border:1px solid rgba(100,116,139,0.3); }
+/* VILLAGE AUTOCOMPLETE */
+.village-wrap { position:relative; }
+.village-suggestions { position:absolute; top:100%; left:0; right:0; z-index:200; background:var(--surface); border:1.5px solid var(--border2); border-radius:12px; max-height:160px; overflow-y:auto; box-shadow:var(--card-shadow); margin-top:4px; display:none; }
+.village-suggestions.open { display:block; }
+.vs-item { padding:9px 13px; cursor:pointer; font-size:13px; transition:background 0.15s; border-bottom:1px solid var(--border); }
+.vs-item:last-child { border-bottom:none; }
+.vs-item:hover { background:rgba(99,102,241,0.1); color:var(--accent); }
 
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-.toast-container { position:fixed; bottom:24px; right:24px; z-index:9000; display:flex; flex-direction:column; gap:8px; }
-.toast { padding:12px 16px; border-radius:10px; font-size:13px; font-weight:600; max-width:320px; animation:fadeIn 0.3s ease; }
-.toast.success { background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
-.toast.error   { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); }
-.toast.warning { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); }
-.toast.info    { background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); }
-.toast.fade-out { opacity:0; transform:translateX(20px); transition:all 0.3s; }
+.submit-btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:8px; }
+.submit-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px var(--accent-glow); }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
 </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <div class="nav-logo" id="navLogo">💛 EventPay</div>
+  <div class="nav-logo" id="navEventName">EventPay</div>
   <div class="nav-links">
     <a href="index.html" class="nav-link">Home</a>
     <a href="donors.html" class="nav-link">Donors</a>
-    <a href="status.html" class="nav-link">Check Status</a>
+    <a href="status.html" class="nav-link">Status</a>
     <a href="complaint.html" class="nav-link active">Support</a>
     <a href="contact.html" class="nav-link">Contact</a>
     <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
@@ -106,78 +89,56 @@
 <div class="nav-mobile" id="navMobile">
   <a href="index.html">🏠 Home</a>
   <a href="donors.html">👥 Donors</a>
-  <a href="status.html">🔍 Check Status</a>
-  <a href="complaint.html">💬 Support</a>
+  <a href="status.html">🔍 Status</a>
+  <a href="complaint.html">📋 Support</a>
   <a href="contact.html">📞 Contact</a>
 </div>
 
-<!-- HERO -->
 <div class="page-hero">
   <h1>💬 Support Center</h1>
-  <p>Submit a complaint, track your case, or get help with your payment. We respond within 24 hours.</p>
+  <p>Submit a complaint, track your case, or get help with your payment</p>
 </div>
 
 <div class="page-content">
-<div class="complaint-layout">
-
+<div class="layout">
   <!-- LEFT: FORM -->
   <div>
-
-    <!-- SUCCESS STATE -->
+    <!-- SUCCESS -->
     <div id="successState" style="display:none">
       <div class="card-modern success-screen">
         <div class="success-icon">✅</div>
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Complaint Submitted!</h2>
-        <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">We'll respond within 24 hours to your email or phone.</p>
-        <div class="track-result" style="max-width:340px;margin:0 auto 20px;text-align:left">
-          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Your Reference ID</div>
-          <div id="cIDDisplay" style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--accent);letter-spacing:2px">—</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Save this ID to track your complaint</div>
+        <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Complaint Submitted!</h2>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:13px">We'll respond within 24 hours.</p>
+        <div class="track-result" style="max-width:300px;margin:0 auto 20px;text-align:left">
+          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Your Complaint ID</div>
+          <div id="cIDDisplay" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--accent)">—</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Save this to track your complaint</div>
         </div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
           <button class="btn-outline" onclick="resetForm()">Submit Another</button>
-          <a href="index.html" class="btn-primary">← Back to Home</a>
+          <a href="index.html" class="btn-primary" style="text-decoration:none">← Back to Home</a>
         </div>
       </div>
     </div>
 
-    <!-- FORM STATE -->
+    <!-- FORM -->
     <div id="formState">
-      <h2 style="font-size:20px;font-weight:800;margin-bottom:20px">Submit a Request</h2>
+      <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">Submit a Request</h2>
 
-      <!-- TOPIC SELECTION -->
-      <div style="margin-bottom:22px">
-        <div class="form-label" style="margin-bottom:10px">What's this about?</div>
+      <!-- TOPIC -->
+      <div style="margin-bottom:18px">
+        <div class="form-label" style="margin-bottom:8px">What's this about?</div>
         <div class="topics-grid">
-          <div class="topic-card selected" data-topic="payment" onclick="selectTopic(this)">
-            <div class="topic-icon">💳</div>
-            <div><div class="topic-title">Payment Issue</div><div class="topic-desc">Failed payment, wrong amount</div></div>
-          </div>
-          <div class="topic-card" data-topic="refund" onclick="selectTopic(this)">
-            <div class="topic-icon">↩️</div>
-            <div><div class="topic-title">Refund Request</div><div class="topic-desc">Want to get money back</div></div>
-          </div>
-          <div class="topic-card" data-topic="receipt" onclick="selectTopic(this)">
-            <div class="topic-icon">📄</div>
-            <div><div class="topic-title">Receipt / Proof</div><div class="topic-desc">Need confirmation of payment</div></div>
-          </div>
-          <div class="topic-card" data-topic="technical" onclick="selectTopic(this)">
-            <div class="topic-icon">🔧</div>
-            <div><div class="topic-title">Technical Issue</div><div class="topic-desc">App or website not working</div></div>
-          </div>
-          <div class="topic-card" data-topic="event" onclick="selectTopic(this)">
-            <div class="topic-icon">📋</div>
-            <div><div class="topic-title">Event Problem</div><div class="topic-desc">Wrong details, access issue</div></div>
-          </div>
-          <div class="topic-card" data-topic="other" onclick="selectTopic(this)">
-            <div class="topic-icon">💬</div>
-            <div><div class="topic-title">Other</div><div class="topic-desc">Something not listed</div></div>
-          </div>
+          <div class="topic-card selected" data-topic="payment" onclick="selectTopic(this)"><div class="topic-icon">💳</div><div><div class="topic-title">Payment Issue</div><div class="topic-desc">Failed, wrong amount</div></div></div>
+          <div class="topic-card" data-topic="refund" onclick="selectTopic(this)"><div class="topic-icon">↩️</div><div><div class="topic-title">Refund Request</div><div class="topic-desc">Want money back</div></div></div>
+          <div class="topic-card" data-topic="receipt" onclick="selectTopic(this)"><div class="topic-icon">📄</div><div><div class="topic-title">Receipt / Proof</div><div class="topic-desc">Need confirmation</div></div></div>
+          <div class="topic-card" data-topic="verification" onclick="selectTopic(this)"><div class="topic-icon">✅</div><div><div class="topic-title">Verification Issue</div><div class="topic-desc">Payment not verified</div></div></div>
+          <div class="topic-card" data-topic="technical" onclick="selectTopic(this)"><div class="topic-icon">🔧</div><div><div class="topic-title">Technical Issue</div><div class="topic-desc">App not working</div></div></div>
+          <div class="topic-card" data-topic="other" onclick="selectTopic(this)"><div class="topic-icon">💬</div><div><div class="topic-title">Other</div><div class="topic-desc">Something else</div></div></div>
         </div>
       </div>
 
-      <!-- FIELDS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="form-group" style="margin:0">
           <label class="form-label">Your Name *</label>
           <input class="form-input" id="cName" placeholder="Full name" autocomplete="name">
@@ -189,25 +150,29 @@
           <div class="field-error" id="cPhoneErr">Valid phone required</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="form-group" style="margin:0">
           <label class="form-label">Email (for reply)</label>
           <input class="form-input" id="cEmail" type="email" placeholder="your@email.com">
         </div>
         <div class="form-group" style="margin:0">
           <label class="form-label">Village / Area *</label>
-          <input class="form-input" id="cVillage" placeholder="Your village">
+          <div class="village-wrap">
+            <input class="form-input" id="cVillage" placeholder="Your village" oninput="filterVillages(this.value)" onblur="setTimeout(()=>closeVillages(),200)" autocomplete="off">
+            <div class="village-suggestions" id="villageSuggestions"></div>
+          </div>
           <div class="field-error" id="cVillageErr">Village is required</div>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Payment / Receipt ID (if applicable)</label>
-        <input class="form-input" id="cPaymentId" placeholder="UTR / Receipt number — helps us find your payment faster">
-        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Leave blank if you don't have it</div>
+        <label class="form-label">UTR / Receipt ID (if applicable)</label>
+        <input class="form-input" id="cPaymentId" placeholder="Helps us find your payment faster">
       </div>
       <div class="form-group">
         <label class="form-label">Describe your issue *</label>
-        <textarea class="form-input" id="cComplaint" placeholder="Please describe what happened, when it happened, and what you expected. The more detail, the faster we can help." style="min-height:120px;resize:vertical" maxlength="2000" oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
+        <textarea class="form-input" id="cComplaint" style="min-height:110px;resize:vertical" maxlength="2000"
+          placeholder="Describe what happened, when, and what you expected. More detail = faster help."
+          oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
         <div style="display:flex;justify-content:space-between;margin-top:4px">
           <div class="field-error" id="cComplaintErr">Please describe your issue</div>
           <div style="font-size:11px;color:var(--text-dim);margin-left:auto"><span id="charCount">0</span>/2000</div>
@@ -215,32 +180,24 @@
       </div>
       <div class="form-group">
         <label class="form-label">Attach Screenshot (optional, max 5MB)</label>
-        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+          ondragover="ev(event,true)" ondragleave="ev(event,false)" ondrop="onDrop(event)">
           <input type="file" id="fileInput" accept="image/*,.pdf" onchange="onFileSelect(this)">
-          <div id="uploadDefault">
-            <div style="font-size:28px;margin-bottom:8px">📎</div>
-            <div style="font-size:13px;color:var(--text-muted)">Click or drag a screenshot here</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Images or PDF, max 5MB</div>
-          </div>
-          <div id="uploadPreview" style="display:none;align-items:center;gap:10px;justify-content:center"></div>
+          <div id="uploadDefault"><div style="font-size:28px;margin-bottom:6px">📎</div><div style="font-size:12px;color:var(--text-muted)">Click or drag a file here</div><div style="font-size:11px;color:var(--text-dim);margin-top:3px">Images or PDF, max 5MB</div></div>
+          <div id="uploadPreview" style="display:none;align-items:center;gap:8px;justify-content:center;font-size:12px"></div>
         </div>
+        <div class="file-chosen" id="fileChosen"><span>📄</span><span id="fileName">No file</span><button onclick="clearFile(event)" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;line-height:1">✕</button></div>
       </div>
       <div class="form-group">
         <label class="form-label">Priority</label>
-        <select class="form-select" id="cPriority">
-          <option value="normal">Normal — Can wait 24–48 hours</option>
-          <option value="high">High — Needs attention today</option>
-          <option value="urgent">Urgent — Payment issue, immediate help needed</option>
+        <select class="form-input" id="cPriority">
+          <option value="Normal">Normal — Can wait 24–48 hours</option>
+          <option value="High">High — Needs attention today</option>
+          <option value="Urgent">Urgent — Immediate help needed</option>
         </select>
       </div>
-
-      <button class="btn-primary" id="submitBtn" onclick="submitComplaint()" style="width:100%;padding:14px;font-size:15px;justify-content:center">
-        📤 Submit Complaint
-      </button>
-      <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px">
-        By submitting, you agree to our <a href="privacy_policy.html" style="color:var(--accent)">Privacy Policy</a>.
-        We respond within 24 hours.
-      </p>
+      <button class="submit-btn" id="submitBtn" onclick="submitComplaint()">📤 Submit Complaint</button>
+      <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px">By submitting, you agree to our <a href="privacy.html" class="text-link">Privacy Policy</a>.</p>
     </div>
   </div>
 
@@ -249,30 +206,28 @@
     <!-- TRACK -->
     <div class="sidebar-card">
       <h3>🔍 Track Your Complaint</h3>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:10px">
         <label class="form-label">Complaint ID</label>
-        <input class="form-input" id="trackId" placeholder="CP123456789" style="font-family:'JetBrains Mono',monospace">
+        <input class="form-input" id="trackId" placeholder="CP12345678" style="font-family:'JetBrains Mono',monospace;font-size:13px">
       </div>
-      <button class="btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="trackComplaint()">
-        Track Status →
-      </button>
+      <button class="btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="trackComplaint()">Track Status →</button>
       <div id="trackResult"></div>
     </div>
 
     <!-- SUPPORT INFO -->
     <div class="sidebar-card">
-      <h3>📞 Support Channels</h3>
+      <h3>📞 Support</h3>
       <div class="info-row">
-        <div class="info-row-icon">📧</div>
-        <div><div class="info-row-label">Email Support</div><div class="info-row-value"><a href="mailto:support@eventpay.in" style="color:var(--accent)">support@eventpay.in</a></div></div>
+        <div class="info-icon">⏰</div>
+        <div><div class="info-label">Support Hours</div><div class="info-value">Mon–Sat, 9 AM – 8 PM IST</div></div>
       </div>
       <div class="info-row">
-        <div class="info-row-icon">⏰</div>
-        <div><div class="info-row-label">Support Hours</div><div class="info-row-value">Mon–Sat, 9 AM – 8 PM IST</div></div>
+        <div class="info-icon">⚡</div>
+        <div><div class="info-label">Avg Response</div><div class="info-value">Under 4 hours</div></div>
       </div>
       <div class="info-row">
-        <div class="info-row-icon">⚡</div>
-        <div><div class="info-row-label">Avg Response Time</div><div class="info-row-value">Under 4 hours</div></div>
+        <div class="info-icon">📧</div>
+        <div><div class="info-label">Email</div><div class="info-value"><a href="mailto:support@eventpay.in" class="text-link">support@eventpay.in</a></div></div>
       </div>
     </div>
 
@@ -280,19 +235,19 @@
     <div class="sidebar-card">
       <h3>❓ Common Questions</h3>
       <div class="faq-item">
-        <button class="faq-q">Payment deducted but not confirmed <span class="faq-chevron">⌄</span></button>
-        <div class="faq-a">Payments via UPI are confirmed within minutes. If deducted but not confirmed, wait 2–4 hours. If still not confirmed, submit a complaint with your UTR number.</div>
+        <button class="faq-q" onclick="toggleFAQ(this)">Payment deducted but not confirmed <span class="faq-chevron">⌄</span></button>
+        <div class="faq-a">Wait 2–4 hours — UPI settlements can take time. If still not confirmed, submit a complaint with your UTR number and our admin will check it.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">How do I get a refund? <span class="faq-chevron">⌄</span></button>
+        <button class="faq-q" onclick="toggleFAQ(this)">How to check my payment status? <span class="faq-chevron">⌄</span></button>
+        <div class="faq-a">Go to the <a href="status.html" class="text-link">Status page</a> and search with your phone number, UTR, or Reference ID. Your record appears after successful payment.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">How do I get a refund? <span class="faq-chevron">⌄</span></button>
         <div class="faq-a">Refunds are processed by the event organizer. Submit a refund request with your UTR and reason. Refunds take 5–7 business days once approved.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">I didn't receive confirmation <span class="faq-chevron">⌄</span></button>
-        <div class="faq-a">Use the "Check Status" page with your phone number or UTR to verify your payment. Your record appears immediately after successful payment.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Wrong name or village in my record <span class="faq-chevron">⌄</span></button>
+        <button class="faq-q" onclick="toggleFAQ(this)">Wrong name or village in my record <span class="faq-chevron">⌄</span></button>
         <div class="faq-a">Submit a complaint with your UTR number and the correct information. Our admin will update your record within 24 hours.</div>
       </div>
     </div>
@@ -300,158 +255,122 @@
 </div>
 </div>
 
+<footer class="footer"><p>💬 Support Center — We respond within 24 hours</p></footer>
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="config.js"></script>
 <script>
-let selectedTopic = "payment", uploadedFile = null;
+let selectedTopic="payment", uploadedFile=null, villages=[];
 
-// Load event name
-fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings").then(r => r.json()).then(s => {
-  const n = s.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
-  document.getElementById("navLogo").textContent = "💛 " + n;
-  document.title = "Support — " + n;
-}).catch(() => {});
+Promise.all([
+  fetch(APP_CONFIG.SCRIPT_URL+"?action=getSettings").then(r=>r.json()).catch(()=>({})),
+  fetch(APP_CONFIG.SCRIPT_URL+"?action=getVillageSuggestions").then(r=>r.json()).catch(()=>({villages:[]}))
+]).then(([settings,vsug])=>{
+  const n=settings.EventName||APP_CONFIG.EVENT_NAME||"EventPay";
+  document.getElementById("navEventName").textContent=n;
+  document.title="Support — "+n;
+  villages=vsug.villages||[];
+});
 
-function selectTopic(el) {
-  document.querySelectorAll(".topic-card").forEach(t => t.classList.remove("selected"));
-  el.classList.add("selected");
-  selectedTopic = el.dataset.topic;
+function selectTopic(el){document.querySelectorAll(".topic-card").forEach(t=>t.classList.remove("selected"));el.classList.add("selected");selectedTopic=el.dataset.topic;}
+function toggleFAQ(btn){const item=btn.closest(".faq-item");const isOpen=item.classList.contains("open");document.querySelectorAll(".faq-item").forEach(i=>i.classList.remove("open"));if(!isOpen)item.classList.add("open");}
+
+// Village autocomplete
+function filterVillages(q){
+  const box=document.getElementById("villageSuggestions");
+  if(!q||q.length<2){box.classList.remove("open");return;}
+  const matches=villages.filter(v=>v.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!matches.length){box.classList.remove("open");return;}
+  box.innerHTML=matches.map(v=>`<div class="vs-item" onclick="selectVillage('${v.replace(/'/g,"\\'")}')">📍 ${v}</div>`).join('');
+  box.classList.add("open");
 }
+function selectVillage(v){document.getElementById("cVillage").value=v;closeVillages();}
+function closeVillages(){document.getElementById("villageSuggestions").classList.remove("open");}
 
 // File upload
-function onDragOver(e) { e.preventDefault(); document.getElementById("uploadArea").classList.add("drag-over"); }
-function onDragLeave(e) { document.getElementById("uploadArea").classList.remove("drag-over"); }
-function onDrop(e) { e.preventDefault(); document.getElementById("uploadArea").classList.remove("drag-over"); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); }
-function onFileSelect(i) { if (i.files[0]) setFile(i.files[0]); }
-function setFile(file) {
-  if (file.size > 5 * 1024 * 1024) { toast("File must be under 5MB", "error"); return; }
-  uploadedFile = file;
-  document.getElementById("uploadDefault").style.display = "none";
-  const p = document.getElementById("uploadPreview");
-  p.style.display = "flex";
-  p.innerHTML = `<span>📎</span><span style="font-size:13px;font-weight:600">${file.name}</span><span style="font-size:11px;color:var(--text-dim)">${(file.size/1024).toFixed(0)}KB</span><button onclick="clearFile(event)" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:20px;line-height:1">×</button>`;
+function ev(e,over){e.preventDefault();document.getElementById("uploadZone").classList.toggle("drag-over",over);}
+function onDrop(e){e.preventDefault();document.getElementById("uploadZone").classList.remove("drag-over");if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0]);}
+function onFileSelect(i){if(i.files[0])setFile(i.files[0]);}
+function setFile(file){
+  if(file.size>5*1024*1024){toast("File must be under 5MB","error");return;}
+  uploadedFile=file;
+  document.getElementById("uploadDefault").style.display="none";
+  document.getElementById("uploadPreview").style.display="flex";
+  document.getElementById("uploadPreview").innerHTML=`<span>📎</span><span>${file.name}</span><span style="color:var(--text-dim)">${(file.size/1024).toFixed(0)}KB</span>`;
+  document.getElementById("fileChosen").classList.add("show");
+  document.getElementById("fileName").textContent=file.name+" ("+(Math.round(file.size/1024))+"KB)";
 }
-function clearFile(e) {
-  e && e.stopPropagation();
-  uploadedFile = null;
-  document.getElementById("uploadDefault").style.display = "block";
-  document.getElementById("uploadPreview").style.display = "none";
-  document.getElementById("fileInput").value = "";
-}
-
-// Validate
-function v(id, errId, test) {
-  const ok = test(document.getElementById(id).value.trim());
-  document.getElementById(errId).classList.toggle("show", !ok);
-  return ok;
+function clearFile(e){
+  if(e)e.stopPropagation();
+  uploadedFile=null;
+  document.getElementById("fileInput").value="";
+  document.getElementById("uploadDefault").style.display="block";
+  document.getElementById("uploadPreview").style.display="none";
+  document.getElementById("fileChosen").classList.remove("show");
 }
 
-async function submitComplaint() {
-  const ok1 = v("cName", "cNameErr", x => x.length > 1);
-  const ok2 = v("cPhone", "cPhoneErr", x => /^\d{10}$/.test(x));
-  const ok3 = v("cVillage", "cVillageErr", x => x.length > 1);
-  const ok4 = v("cComplaint", "cComplaintErr", x => x.length >= 10);
-  if (!ok1 || !ok2 || !ok3 || !ok4) { toast("Please fill all required fields", "warning"); return; }
+async function submitComplaint(){
+  let ok=true;
+  const name=document.getElementById("cName").value.trim();
+  const phone=document.getElementById("cPhone").value.trim();
+  const village=document.getElementById("cVillage").value.trim();
+  const complaint=document.getElementById("cComplaint").value.trim();
+  if(name.length<2){document.getElementById("cNameErr").classList.add("show");ok=false;}else{document.getElementById("cNameErr").classList.remove("show");}
+  if(!/^\d{10}$/.test(phone)){document.getElementById("cPhoneErr").classList.add("show");ok=false;}else{document.getElementById("cPhoneErr").classList.remove("show");}
+  if(village.length<2){document.getElementById("cVillageErr").classList.add("show");ok=false;}else{document.getElementById("cVillageErr").classList.remove("show");}
+  if(complaint.length<10){document.getElementById("cComplaintErr").classList.add("show");ok=false;}else{document.getElementById("cComplaintErr").classList.remove("show");}
+  if(!ok){toast("Please fill all required fields","warning");return;}
 
-  const btn = document.getElementById("submitBtn");
-  btn.disabled = true; btn.textContent = "Submitting...";
+  const btn=document.getElementById("submitBtn"); btn.disabled=true; btn.textContent="Submitting...";
 
-  try {
-    let fileData = "", fileName = "", fileType = "";
-    if (uploadedFile) {
-      fileData = await toBase64(uploadedFile);
-      fileName = uploadedFile.name;
-      fileType = uploadedFile.type;
-    }
-    const params = new URLSearchParams({
-      action: "insertComplaint",
-      name: document.getElementById("cName").value.trim(),
-      phone: document.getElementById("cPhone").value.trim(),
-      village: document.getElementById("cVillage").value.trim(),
-      email: document.getElementById("cEmail").value.trim(),
-      complaint: `[${selectedTopic.toUpperCase()}] ${document.getElementById("cComplaint").value.trim()}`,
-      filename: fileName, filetype: fileType, filedata: fileData
-    });
-    const r = await fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params });
-    const d = await r.json();
-
-    if (d.result === "Inserted" && d.complaintID) {
-      document.getElementById("cIDDisplay").textContent = d.complaintID;
-      document.getElementById("formState").style.display = "none";
-      document.getElementById("successState").style.display = "block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      toast(d.error || "Submission failed. Please try again.", "error");
-      btn.disabled = false; btn.textContent = "📤 Submit Complaint";
-    }
-  } catch(e) {
-    toast("Connection error. Please try again.", "error");
-    btn.disabled = false; btn.textContent = "📤 Submit Complaint";
+  let filedata="",filename="",filetype="";
+  if(uploadedFile){
+    try{
+      filedata=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(uploadedFile);});
+      filename=uploadedFile.name; filetype=uploadedFile.type;
+    }catch(e){toast("Could not read file","error");btn.disabled=false;btn.textContent="📤 Submit Complaint";return;}
   }
+
+  const fullComplaint=`[${selectedTopic.toUpperCase()}${document.getElementById("cPaymentId").value.trim()?" | Ref: "+document.getElementById("cPaymentId").value.trim():""}] ${complaint}`;
+
+  const params=new URLSearchParams({action:"insertComplaint",name,village,phone,
+    email:document.getElementById("cEmail").value.trim(),
+    complaint:fullComplaint,filedata,filename,filetype});
+
+  fetch(APP_CONFIG.SCRIPT_URL,{method:"POST",body:params}).then(r=>r.json()).then(res=>{
+    btn.disabled=false; btn.textContent="📤 Submit Complaint";
+    if(res.result==="Inserted"&&res.complaintID){
+      document.getElementById("cIDDisplay").textContent=res.complaintID;
+      document.getElementById("formState").style.display="none";
+      document.getElementById("successState").style.display="block";
+      window.scrollTo({top:0,behavior:"smooth"});
+    } else {
+      toast(res.error||"Submission failed. Please try again.","error");
+    }
+  }).catch(()=>{btn.disabled=false;btn.textContent="📤 Submit Complaint";toast("Connection error. Please try again.","error");});
 }
 
-async function trackComplaint() {
-  const id = document.getElementById("trackId").value.trim();
-  if (!id) { toast("Enter your complaint ID", "warning"); return; }
-  const el = document.getElementById("trackResult");
-  el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Searching...</div>';
-  // We query complaints via admin endpoint — for public, we show basic info only
-  // Fallback: show message to contact support if not found
-  setTimeout(() => {
-    el.innerHTML = `<div class="track-result" style="margin-top:12px">
-      <div style="font-size:12px;color:var(--text-muted)">To check complaint status, please contact support with your reference ID: <strong style="color:var(--accent)">${id}</strong></div>
-    </div>`;
-  }, 800);
+function resetForm(){
+  document.getElementById("successState").style.display="none";
+  document.getElementById("formState").style.display="block";
+  ["cName","cPhone","cEmail","cVillage","cComplaint","cPaymentId"].forEach(id=>document.getElementById(id).value="");
+  clearFile(); selectedTopic="payment"; document.querySelectorAll(".topic-card").forEach((t,i)=>t.classList.toggle("selected",i===0));
 }
 
-function resetForm() {
-  document.getElementById("successState").style.display = "none";
-  document.getElementById("formState").style.display = "block";
-  document.getElementById("cName").value = "";
-  document.getElementById("cPhone").value = "";
-  document.getElementById("cEmail").value = "";
-  document.getElementById("cVillage").value = "";
-  document.getElementById("cComplaint").value = "";
-  document.getElementById("cPaymentId").value = "";
-  clearFile();
-  uploadedFile = null;
+function trackComplaint(){
+  const id=document.getElementById("trackId").value.trim();
+  if(!id){toast("Enter your complaint ID","warning");return;}
+  const el=document.getElementById("trackResult");
+  el.innerHTML='<div style="padding:10px;text-align:center;color:var(--text-muted)">Searching...</div>';
+  setTimeout(()=>{
+    el.innerHTML=`<div class="track-result">To check status, contact support with your ID: <strong style="color:var(--accent)">${id}</strong>. Or email us at <a href="mailto:support@eventpay.in" class="text-link">support@eventpay.in</a>.</div>`;
+  },700);
 }
 
-function toBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-// FAQ accordion
-document.querySelectorAll(".faq-q").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const item = btn.closest(".faq-item");
-    const isOpen = item.classList.contains("open");
-    document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
-    if (!isOpen) item.classList.add("open");
-  });
-});
-
-function toggleNav() { document.getElementById("navMobile").classList.toggle("open"); }
-function toggleTheme() {
-  const c = document.documentElement.getAttribute('data-theme') || 'dark', n = c === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', n); localStorage.setItem('theme', n);
-  document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️ Light' : '🌙 Dark';
-}
-window.addEventListener('DOMContentLoaded', () => {
-  const t = document.documentElement.getAttribute('data-theme') || 'dark';
-  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
-});
-function toast(msg, type = "info") {
-  const tc = document.getElementById("toastContainer"), t = document.createElement("div");
-  t.className = "toast " + type; t.textContent = msg; tc.appendChild(t);
-  setTimeout(() => { t.classList.add("fade-out"); setTimeout(() => t.remove(), 300); }, 3500);
-}
+function toggleNav(){document.getElementById("navMobile").classList.toggle("open");}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark',n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️ Light':'🌙 Dark';}
+window.addEventListener('DOMContentLoaded',()=>{const t=document.documentElement.getAttribute('data-theme')||'dark';document.getElementById('themeToggle').textContent=t==='dark'?'☀️ Light':'🌙 Dark';});
+function toast(msg,type="info"){const tc=document.getElementById("toastContainer");const t=document.createElement("div");t.className="toast "+type;t.textContent=msg;tc.appendChild(t);setTimeout(()=>{t.classList.add("fade-out");setTimeout(()=>t.remove(),300);},3500);}
 </script>
 <script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </body>
