@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>(function(){ const t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6366f1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — EventPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.page-hero { background:linear-gradient(135deg,#1e1b4b,#312e81); padding:40px 20px; text-align:center; border-bottom:1px solid var(--border); }
+[data-theme="light"] .page-hero { background:linear-gradient(135deg,#4f46e5,#7c3aed); }
+.page-hero h1 { font-size:clamp(20px,4vw,28px); font-weight:800; color:#fff; margin-bottom:6px; }
+.page-hero p  { color:rgba(255,255,255,0.78); font-size:12px; }
+.doc-wrap { max-width:720px; margin:0 auto; padding:28px 16px 60px; }
+.doc-section { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:14px; }
+.doc-section h2 { font-size:15px; font-weight:800; margin-bottom:12px; display:flex; align-items:center; gap:8px; color:var(--text); }
+.doc-section p,.doc-section li { font-size:13px; color:var(--text-muted); line-height:1.8; margin-bottom:8px; }
+.doc-section ul { padding-left:20px; }
+.doc-section li { margin-bottom:4px; }
+.highlight-box { background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:10px; padding:14px; margin-bottom:12px; font-size:13px; color:var(--text-muted); }
+.protected-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-size:11px; font-weight:700; margin-right:6px; margin-bottom:6px; }
+.toc a { display:block; padding:7px 12px; color:var(--text-muted); text-decoration:none; font-size:13px; border-left:2px solid var(--border); transition:all 0.2s; margin-bottom:2px; }
+.toc a:hover { color:var(--accent); border-left-color:var(--accent); padding-left:16px; }
+.last-updated { font-size:11px; color:var(--text-dim); margin-bottom:20px; padding:10px 14px; background:var(--surface2); border-radius:8px; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo" id="navEventName">EventPay</div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="status.html" class="nav-link">Status</a>
+    <a href="complaint.html" class="nav-link">Support</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+  </div>
+  <button class="hamburger" onclick="toggleNav()">☰</button>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="index.html">🏠 Home</a>
+  <a href="status.html">🔍 Status</a>
+  <a href="complaint.html">📋 Support</a>
+  <a href="contact.html">📞 Contact</a>
+</div>
+
+<div class="page-hero">
+  <h1>🛡️ Privacy Policy</h1>
+  <p>How we collect, use, and protect your information</p>
+</div>
+
+<div class="doc-wrap">
+  <div class="last-updated">📅 Last Updated: December 2024 · Effective Date: December 2024</div>
+
+  <!-- TOC -->
+  <div class="doc-section" style="margin-bottom:20px">
+    <h2>📋 Table of Contents</h2>
+    <div class="toc">
+      <a href="#s1">1. Information We Collect</a>
+      <a href="#s2">2. How We Use Your Information</a>
+      <a href="#s3">3. Payment Data Protection</a>
+      <a href="#s4">4. What We Do NOT Share Publicly</a>
+      <a href="#s5">5. Data Storage & Security</a>
+      <a href="#s6">6. Your Rights</a>
+      <a href="#s7">7. Cookies & Local Storage</a>
+      <a href="#s8">8. Third-Party Services</a>
+      <a href="#s9">9. Children's Privacy</a>
+      <a href="#s10">10. Contact Us</a>
+    </div>
+  </div>
+
+  <!-- IMPORTANT HIGHLIGHT -->
+  <div class="doc-section" style="border-color:rgba(99,102,241,0.3)">
+    <h2>🔒 Our Core Privacy Promise</h2>
+    <div class="highlight-box">
+      <strong>Your payment details are NEVER shown publicly.</strong> Phone numbers, UTR transaction IDs, full addresses, and payment amounts are visible only to authorized event administrators. The public donor list shows only first name and contribution amount.
+    </div>
+    <div>
+      <span class="protected-badge">✅ Phone Hidden</span>
+      <span class="protected-badge">✅ UTR Hidden</span>
+      <span class="protected-badge">✅ Email Hidden</span>
+      <span class="protected-badge">✅ Full Amount Admin-Only</span>
+    </div>
+  </div>
+
+  <div class="doc-section" id="s1">
+    <h2>📝 1. Information We Collect</h2>
+    <p>When you make a contribution through EventPay, we collect:</p>
+    <ul>
+      <li><strong>Full Name</strong> — Used to identify your contribution</li>
+      <li><strong>Village / Area</strong> — Used for organizing donor lists by location</li>
+      <li><strong>Phone Number</strong> — Used to prevent duplicate contributions and for admin verification only</li>
+      <li><strong>Contribution Amount</strong> — The amount you contributed</li>
+      <li><strong>UTR / Transaction Reference</strong> — Your UPI transaction ID for payment verification</li>
+      <li><strong>Submission Date &amp; Time</strong> — Auto-recorded at time of submission</li>
+    </ul>
+    <p>When you file a complaint, we additionally collect:</p>
+    <ul>
+      <li>Email address (optional, for reply)</li>
+      <li>Complaint description</li>
+      <li>Any attached screenshots (stored securely)</li>
+    </ul>
+  </div>
+
+  <div class="doc-section" id="s2">
+    <h2>🎯 2. How We Use Your Information</h2>
+    <ul>
+      <li>To record and verify your payment contribution</li>
+      <li>To display your name on the public donor list (if enabled by the organizer)</li>
+      <li>To prevent duplicate or fraudulent payments</li>
+      <li>To allow admins to verify UPI transaction authenticity</li>
+      <li>To send you a payment receipt (via the app, not email)</li>
+      <li>To respond to complaints or support requests</li>
+      <li>To generate anonymized analytics (village-wise totals, contribution counts)</li>
+    </ul>
+    <p>We do <strong>NOT</strong> use your data for marketing, advertising, or selling to third parties.</p>
+  </div>
+
+  <div class="doc-section" id="s3">
+    <h2>💳 3. Payment Data Protection</h2>
+    <p>EventPay operates on UPI — we do <strong>not</strong> process, store, or have access to your bank account credentials, debit/credit card numbers, or UPI PIN.</p>
+    <p>The UTR (Unique Transaction Reference) you submit is:</p>
+    <ul>
+      <li>Stored securely in a private Google Sheet accessible only to event admins</li>
+      <li>Used only for verifying that your UPI payment was made</li>
+      <li>Never shown on any public page</li>
+      <li>Checked against a fraud detection algorithm to prevent fake submissions</li>
+    </ul>
+    <div class="highlight-box">⚠️ <strong>Important:</strong> If you receive a suspicious call asking for your UPI PIN, OTP, or bank details claiming to be from EventPay — it is a scam. EventPay never asks for your PIN, OTP, or password.</div>
+  </div>
+
+  <div class="doc-section" id="s4">
+    <h2>🚫 4. What We Do NOT Share Publicly</h2>
+    <p>The following information is <strong>never visible</strong> to the public:</p>
+    <ul>
+      <li>Your phone number</li>
+      <li>Your UTR / transaction ID</li>
+      <li>Your email address</li>
+      <li>Your exact contribution amount (on certain configurations)</li>
+      <li>Complaint details or correspondence</li>
+      <li>Admin-flagged payment status or fraud scores</li>
+    </ul>
+    <p>The public donor list (if enabled) shows only:</p>
+    <ul>
+      <li>Your name (as entered)</li>
+      <li>Your contribution amount</li>
+      <li>Date of contribution</li>
+    </ul>
+    <p>If you wish to be hidden from the public donor list, please contact the event organizer or <a href="contact.html" class="text-link">contact us</a>.</p>
+  </div>
+
+  <div class="doc-section" id="s5">
+    <h2>🔐 5. Data Storage &amp; Security</h2>
+    <p>All data is stored in Google Sheets, which is:</p>
+    <ul>
+      <li>Protected by Google's enterprise-grade security</li>
+      <li>Accessible only to authorized admins with a username and password</li>
+      <li>Subject to session-based authentication with automatic expiry</li>
+      <li>Backed up automatically by Google</li>
+    </ul>
+    <p>Admin actions are logged in an audit trail. Every change — status updates, data edits, logins — is recorded with timestamp and admin name.</p>
+    <p>We take reasonable precautions to protect your data but cannot guarantee absolute security of any internet transmission.</p>
+  </div>
+
+  <div class="doc-section" id="s6">
+    <h2>✊ 6. Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> — Request a copy of your personal data we hold</li>
+      <li><strong>Correction</strong> — Request correction of incorrect information</li>
+      <li><strong>Deletion</strong> — Request deletion of your data (subject to event organizer discretion for financial records)</li>
+      <li><strong>Visibility Control</strong> — Request to be hidden from the public donor list</li>
+    </ul>
+    <p>To exercise these rights, <a href="contact.html" class="text-link">contact us</a> or <a href="complaint.html" class="text-link">submit a request</a>. We will respond within 7 business days.</p>
+  </div>
+
+  <div class="doc-section" id="s7">
+    <h2>🍪 7. Cookies &amp; Local Storage</h2>
+    <p>EventPay uses browser <strong>localStorage</strong> (not cookies) for:</p>
+    <ul>
+      <li>Theme preference (dark/light mode)</li>
+      <li>Admin session token (expires automatically)</li>
+    </ul>
+    <p>We do not use tracking cookies, advertising pixels, or analytics that identify you personally. No data from localStorage is transmitted to any third party.</p>
+  </div>
+
+  <div class="doc-section" id="s8">
+    <h2>🔗 8. Third-Party Services</h2>
+    <p>EventPay uses the following third-party services:</p>
+    <ul>
+      <li><strong>Google Apps Script &amp; Google Sheets</strong> — For backend data processing. Subject to <a href="https://policies.google.com/privacy" target="_blank" class="text-link" rel="noopener">Google's Privacy Policy</a>.</li>
+      <li><strong>Google Fonts</strong> — For typography (Sora, JetBrains Mono). No personal data shared.</li>
+      <li><strong>UPI Payment Apps</strong> (PhonePe, GPay, Paytm, BHIM) — Payment is processed directly between you and the app. EventPay does not receive your financial credentials.</li>
+    </ul>
+    <p>We are not responsible for the privacy practices of third-party services.</p>
+  </div>
+
+  <div class="doc-section" id="s9">
+    <h2>👶 9. Children's Privacy</h2>
+    <p>EventPay is not intended for children under 13 years of age. We do not knowingly collect personal information from children. If you believe a child has submitted information through our platform, please <a href="contact.html" class="text-link">contact us</a> and we will delete it promptly.</p>
+  </div>
+
+  <div class="doc-section" id="s10">
+    <h2>📞 10. Contact Us</h2>
+    <p>For privacy-related concerns, questions, or data requests:</p>
+    <ul>
+      <li>📧 Email: <a href="mailto:privacy@eventpay.in" class="text-link">privacy@eventpay.in</a></li>
+      <li>📋 <a href="complaint.html" class="text-link">Submit a Request</a></li>
+      <li>📞 <a href="contact.html" class="text-link">Contact Form</a></li>
+    </ul>
+    <p>We will respond within 7 business days.</p>
+    <p style="margin-top:14px;font-size:12px;color:var(--text-dim)">This privacy policy may be updated periodically. Continued use of EventPay after changes constitutes acceptance of the updated policy.</p>
+  </div>
+</div>
+
+<footer class="footer"><p>🛡️ Privacy Policy · <a href="terms.html" class="text-link">Terms</a> · <a href="contact.html" class="text-link">Contact</a></p></footer>
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="config.js"></script>
+<script>
+fetch(APP_CONFIG.SCRIPT_URL+"?action=getSettings").then(r=>r.json()).then(s=>{
+  const n=s.EventName||APP_CONFIG.EVENT_NAME||"EventPay";
+  document.getElementById("navEventName").textContent=n;
+  document.title="Privacy Policy — "+n;
+}).catch(()=>{});
+function toggleNav(){document.getElementById("navMobile").classList.toggle("open");}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark',n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️ Light':'🌙 Dark';}
+window.addEventListener('DOMContentLoaded',()=>{const t=document.documentElement.getAttribute('data-theme')||'dark';document.getElementById('themeToggle').textContent=t==='dark'?'☀️ Light':'🌙 Dark';});
+</script>
+<script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
+</body>
+</html>
