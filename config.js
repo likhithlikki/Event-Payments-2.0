@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const APP_CONFIG = {
   // Paste your deployed Google Apps Script Web App URL here.
   // Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone
-  SCRIPT_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwMZ6MBtAg-9oB_vMMn_ITf8FFVX17z3h-FubJp12Wec8Bljt5ZTpTA8iZ7s2AZ1JJ5/exec",
 
   // Shown in the navbar / page titles before getSettings() responds
   EVENT_NAME: "EventPay",
@@ -279,13 +279,17 @@ const APP_CONFIG = {
 
   // UPI ID that receives contributions, e.g. "yourname@upi"
   // (only used to build the upi://pay deep link + QR — never logged with donor PII)
-  UPI_ID: "yourname@upi",
+  UPI_ID: "9014844036@superyes",
 
   // Fallback min/max contribution (₹) shown before getSettings() responds.
   // Real values live in the Settings sheet and override these at runtime.
   MIN_AMOUNT: 50,
-  MAX_AMOUNT: 0, // 0 = no maximum
+  MAX_AMOUNT: 1000, // 0 = no maximum
 
   // Used by manifest.json / sw.js cache versioning
   APP_VERSION: "2.0.0",
+
+  RAZORPAY_KEY_ID: "rzp_test_T340E8hdWGxGrf"   // <-- ADD THIS (public key only)
+
+  
 };
