@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>(function(){ const t=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — EventPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+@media(max-width:800px){.dash-layout{grid-template-columns:1fr}.sidebar{display:none}.sidebar.open{display:block}}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px 14px}
+.side-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;margin-bottom:4px;transition:all .2s}
+.side-item:hover,.side-item.active{background:var(--accent);color:#fff}
+.main{padding:24px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.role-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(99,102,241,.12);color:var(--accent)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.stat-box .lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.stat-box .val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+.panel{display:none}
+.panel.active{display:block}
+.editor-toggle{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)}
+.editor-toggle.on{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:#f59e0b}
+.village-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border);font-size:13px;gap:8px;flex-wrap:wrap}
+.pill{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.pill.pending{background:rgba(245,158,11,.15);color:#f59e0b}
+.pill.approved{background:rgba(16,185,129,.15);color:#10b981}
+.pill.rejected{background:rgba(239,68,68,.15);color:#ef4444}
+.small-btn{padding:5px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text)}
+.small-btn:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="dash-layout">
+  <div class="sidebar" id="sidebar">
+    <div style="font-weight:800;font-size:16px;margin-bottom:20px" id="sideEventName">EventPay Admin</div>
+    <div class="side-item active" data-panel="overview" onclick="showPanel('overview')">📊 Overview</div>
+    <div class="side-item" data-panel="payments" onclick="showPanel('payments')">💳 Payments</div>
+    <div class="side-item" data-panel="complaints" onclick="showPanel('complaints')">💬 Complaints</div>
+    <div class="side-item" data-panel="villages" onclick="showPanel('villages')">📍 Villages</div>
+    <div class="side-item" data-panel="settings" onclick="showPanel('settings')">⚙️ Settings</div>
+    <div class="side-item" data-panel="audit" onclick="showPanel('audit')">📜 Audit Log</div>
+    <div class="side-item" onclick="logout()" style="margin-top:20px;color:var(--danger)">🚪 Log Out</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none">☰</button>
+        <span id="welcomeMsg" style="font-size:15px;font-weight:700"></span>
+        <span class="role-badge" id="roleBadge"></span>
+      </div>
+      <div class="editor-toggle" id="editorToggle" onclick="toggleEditorMode()">🔒 View Mode</div>
+    </div>
+
+    <div class="stat-grid" id="statGrid"></div>
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="card"><p style="font-size:13px;color:var(--text-muted)">Welcome to your EventPay dashboard. Use the sidebar to manage payments, complaints, village spellings, and settings.</p></div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="panel" id="panel-payments">
+      <div class="card"><div class="table-wrap" id="paymentsTable">Loading...</div></div>
+    </div>
+
+    <!-- COMPLAINTS -->
+    <div class="panel" id="panel-complaints">
+      <div class="card"><div class="table-wrap" id="complaintsTable">Loading...</div></div>
+    </div>
+
+    <!-- VILLAGES -->
+    <div class="panel" id="panel-villages">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">📍 Village Spelling Review</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+          New spellings guests type appear here as <span class="pill pending">Pending</span>.
+          Approve genuinely new villages, or merge obvious typos into an existing one so guest lists
+          stay clean and the autocomplete dropdown doesn't fragment.
+        </p>
+        <div id="villagesList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">⚙️ Event Settings</div>
+        <div id="settingsForm">Loading...</div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="panel" id="panel-audit">
+      <div class="card"><div class="table-wrap" id="auditTable">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
