@@ -1,0 +1,195 @@
+<!-- ════════════════════════════════════════════════════════════
+     REPLACEMENT #1 — <head> script tags
+     In your existing index.html <head>, DELETE this line (no longer needed):
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+     and ADD this one instead (Razorpay's Checkout.js — required, loads their payment popup):
+════════════════════════════════════════════════════════════ -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     REPLACEMENT #2 — the #paymentSection div
+     Replace your ENTIRE existing <div id="paymentSection">...</div> block with this:
+════════════════════════════════════════════════════════════ -->
+<div id="paymentSection">
+  <div class="card">
+    <div class="back-link" onclick="backToForm()">← Back to Details</div>
+    <div class="card-title"><div class="icon">💳</div>Complete Payment</div>
+
+    <div style="text-align:center;padding:8px 0 18px">
+      <div class="amount-badge" id="amountBadge">₹0</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px">
+        Clicking below opens Razorpay's secure payment window. Pay by card, UPI,
+        wallet, or netbanking — whatever you have configured in your Razorpay account.
+      </p>
+    </div>
+
+    <div id="payMsg" class="msg-box"></div>
+    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+
+    <button class="finish-btn" id="payNowBtn" onclick="openRazorpayCheckout()">🔒 Pay ₹<span id="payNowAmt">0</span> Now</button>
+    <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px">
+      Your payment is processed entirely by Razorpay. EventPay never sees or stores your card, UPI PIN, or bank details.
+    </p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     REPLACEMENT #3 — JavaScript
+     In your existing <script> block:
+       • DELETE these functions entirely: goToPayment(), openUPI(), checkUTRRisk(), finishPayment()
+       • DELETE the "let upiLink=..., utrCheckTimer=null" bits related to UPI/UTR from the
+         top-level `let userData={}, upiLink="", upiID="", ...` line — replace that whole
+         line with the simplified one below
+       • KEEP: showReceipt(), downloadReceipt(), validate(), setStep(), showMsg(),
+         showProgress()/completeProgress(), village autocomplete, everything else
+     ADD the functions below in their place:
+════════════════════════════════════════════════════════════ -->
+<script>
+// Simplified state — no more upiLink / upiID / utrCheckTimer needed
+let userData = {}, eventName = "Event", villages = [];
+
+function generateRefID(){ return "EP"+Date.now().toString().slice(-10); }
+function setStep(n){[1,2,3].forEach(i=>{const e=document.getElementById("step"+i);e.classList.remove("active","done");if(i<n)e.classList.add("done");if(i===n)e.classList.add("active");});}
+
+// STEP 1 -> STEP 2: create the Razorpay order server-side, then show the Pay button
+function goToPayment(){
+  userData = {
+    refid: generateRefID(),
+    name: nameIn.value.trim(),
+    village: villageIn.value.trim(),
+    phone: phoneIn.value.trim(),
+    amount: amountIn.value.trim()
+  };
+
+  document.getElementById("formSection").style.display = "none";
+  document.getElementById("paymentSection").style.display = "block";
+  document.getElementById("amountBadge").textContent = "₹" + Number(userData.amount).toLocaleString("en-IN");
+  document.getElementById("payNowAmt").textContent = Number(userData.amount).toLocaleString("en-IN");
+  setStep(2);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  document.getElementById("payNowBtn").disabled = true;
+  showProgress();
+
+  const params = new URLSearchParams({
+    action: "createRazorpayOrder",
+    eventCode: getEventCode(),
+    amount: userData.amount,
+    name: userData.name,
+    village: userData.village,
+    phone: userData.phone
+  });
+
+  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
+    .then(r => r.json())
+    .then(res => {
+      completeProgress();
+      document.getElementById("payNowBtn").disabled = false;
+      if (res.error) {
+        showMsg("payMsg", "error", res.error);
+        return;
+      }
+      userData.orderId = res.orderId;
+      userData.razorpayKeyId = res.keyId;
+      userData.orderAmount = res.amount; // paise
+    })
+    .catch(() => {
+      completeProgress();
+      document.getElementById("payNowBtn").disabled = false;
+      showMsg("payMsg", "error", "Could not start payment. Please try again.");
+    });
+}
+
+// STEP 2: open Razorpay's own Checkout popup
+function openRazorpayCheckout(){
+  if (!userData.orderId) {
+    showMsg("payMsg", "error", "Payment session not ready yet. Please wait a moment and try again.");
+    return;
+  }
+  const options = {
+    key: userData.razorpayKeyId,           // public Key ID only — no secret ever touches the browser
+    amount: userData.orderAmount,
+    currency: "INR",
+    name: eventName,
+    description: "Contribution — " + userData.name,
+    order_id: userData.orderId,
+    prefill: {
+      name: userData.name,
+      contact: userData.phone,
+      email: document.getElementById("email") ? document.getElementById("email").value : ""
+    },
+    theme: { color: "#f5c842" },
+    handler: function (response) {
+      // response = { razorpay_payment_id, razorpay_order_id, razorpay_signature }
+      confirmPaymentWithServer(response);
+    },
+    modal: {
+      ondismiss: function () {
+        showMsg("payMsg", "warning", "Payment window closed. You can try again anytime.");
+      }
+    }
+  };
+  const rzp = new Razorpay(options);
+  rzp.on("payment.failed", function (resp) {
+    showMsg("payMsg", "error", "Payment failed: " + (resp.error && resp.error.description || "please try again"));
+  });
+  rzp.open();
+}
+
+// After Razorpay's popup succeeds, ask the server to independently verify
+// (signature recheck + live Razorpay API status check) before trusting it.
+function confirmPaymentWithServer(response){
+  document.getElementById("payNowBtn").disabled = true;
+  showProgress();
+  showMsg("payMsg", "info", "Confirming your payment...");
+
+  const params = new URLSearchParams({
+    action: "verifyPayment",
+    eventCode: getEventCode(),
+    razorpay_order_id: response.razorpay_order_id,
+    razorpay_payment_id: response.razorpay_payment_id,
+    razorpay_signature: response.razorpay_signature
+  });
+
+  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
+    .then(r => r.json())
+    .then(res => {
+      completeProgress();
+      document.getElementById("payNowBtn").disabled = false;
+      if (res.success) {
+        showMsg("payMsg", "success", "Payment confirmed!");
+        setTimeout(() => showReceipt(response.razorpay_payment_id), 500);
+      } else {
+        showMsg("payMsg", "error", res.error || "We couldn't confirm this payment. Contact support with your name and phone number — do not pay again.");
+      }
+    })
+    .catch(() => {
+      completeProgress();
+      document.getElementById("payNowBtn").disabled = false;
+      showMsg("payMsg", "error", "Connection error while confirming payment. If money was deducted, contact support — do not pay again.");
+    });
+}
+
+function backToForm(){
+  document.getElementById("paymentSection").style.display = "none";
+  document.getElementById("formSection").style.display = "block";
+  setStep(1);
+}
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     REPLACEMENT #4 — showReceipt()
+     Your existing showReceipt(utr) function reads document.getElementById("r_utr").
+     Replace that one line (r_utr) with a Razorpay Payment ID field instead —
+     there is no UTR in this flow anymore.
+════════════════════════════════════════════════════════════ -->
+<script>
+// Inside showReceipt(paymentId) — replace the old:
+//   document.getElementById("r_utr").textContent = utr;
+// with:
+//   document.getElementById("r_utr").textContent = paymentId;
+// (You can also relabel the receipt row from "UTR No." to "Payment ID" in the HTML.)
+</script>
