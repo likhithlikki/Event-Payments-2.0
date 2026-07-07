@@ -1,1 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery · EventPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+  <div class="lights" aria-hidden="true">
+    <svg viewBox="0 0 800 64" preserveAspectRatio="none">
+      <path d="M0,8 C 100,50 200,50 300,8 S 500,50 600,8 S 800,50 800,8"
+            fill="none" stroke="#cda355" stroke-opacity="0.35" stroke-width="1.5"/>
+      <g fill="#e6c580">
+        <circle class="bulb" cx="30"  cy="14" r="3.5"/>
+        <circle class="bulb" cx="90"  cy="30" r="3.5"/>
+        <circle class="bulb" cx="150" cy="38" r="3.5"/>
+        <circle class="bulb" cx="210" cy="30" r="3.5"/>
+        <circle class="bulb" cx="270" cy="14" r="3.5"/>
+        <circle class="bulb" cx="330" cy="14" r="3.5"/>
+        <circle class="bulb" cx="390" cy="30" r="3.5"/>
+        <circle class="bulb" cx="450" cy="38" r="3.5"/>
+        <circle class="bulb" cx="510" cy="30" r="3.5"/>
+        <circle class="bulb" cx="570" cy="14" r="3.5"/>
+        <circle class="bulb" cx="630" cy="14" r="3.5"/>
+        <circle class="bulb" cx="690" cy="30" r="3.5"/>
+        <circle class="bulb" cx="750" cy="38" r="3.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <nav class="topnav">
+    <span class="topnav__brand">EventPay</span>
+    <div class="topnav__links" id="topnavLinks"></div>
+  </nav>
+
+  <main class="gallery-page">
+    <section class="event-hero event-hero--tight">
+      <p class="event-hero__eyebrow">Gallery</p>
+      <h1 class="event-hero__title" id="galleryTitle">Moments from the day</h1>
+    </section>
+
+    <div class="gallery-page__toolbar">
+      <span class="gallery-page__count" id="galleryCount"></span>
+      <button type="button" class="btn-secondary" id="openUploadBtn">Add a photo</button>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid"></div>
+    <p id="galleryEmpty" class="skeleton" hidden>No photos yet — be the first to share one.</p>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Close">&times;</button>
+    <div class="lightbox__content">
+      <img id="lightboxImg" src="" alt="">
+      <p class="lightbox__meta" id="lightboxMeta"></p>
+    </div>
+  </div>
+
+  <!-- Upload modal -->
+  <div class="modal-backdrop" id="uploadModal">
+    <section class="card" style="max-width:380px;">
+      <p class="contribute-card__label">Share a photo</p>
+      <form id="uploadForm" novalidate>
+        <div class="field">
+          <label for="photoFile">Photo</label>
+          <input type="file" id="photoFile" accept="image/*" required>
+        </div>
+        <img id="uploadPreview" class="upload-preview" alt="Preview">
+        <div class="field">
+          <label for="uploaderName">Your name</label>
+          <input type="text" id="uploaderName" required>
+        </div>
+        <button type="submit" id="uploadBtn" class="btn-primary">Submit for review</button>
+        <button type="button" class="btn-secondary" id="cancelUploadBtn" style="width:100%; margin-top:10px;">Cancel</button>
+      </form>
+    </section>
+  </div>
+
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>

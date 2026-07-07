@@ -13,6 +13,9 @@ const CONFIG = {
 
   APP_NAME: 'EventPay',
 
+  // Suggested contribution amounts (INR), shown as quick-pick chips.
+  QUICK_AMOUNTS: [101, 251, 501, 1001, 2001, 5001],
+
   // The ONLY thing ever kept in browser storage is the event code —
   // never a Spreadsheet ID, never Settings data. sessionStorage (not
   // localStorage) so it clears when the tab closes.

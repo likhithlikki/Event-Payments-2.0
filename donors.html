@@ -1,1 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donors · EventPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+  <div class="lights" aria-hidden="true">
+    <svg viewBox="0 0 800 64" preserveAspectRatio="none">
+      <path d="M0,8 C 100,50 200,50 300,8 S 500,50 600,8 S 800,50 800,8"
+            fill="none" stroke="#cda355" stroke-opacity="0.35" stroke-width="1.5"/>
+      <g fill="#e6c580">
+        <circle class="bulb" cx="30"  cy="14" r="3.5"/>
+        <circle class="bulb" cx="90"  cy="30" r="3.5"/>
+        <circle class="bulb" cx="150" cy="38" r="3.5"/>
+        <circle class="bulb" cx="210" cy="30" r="3.5"/>
+        <circle class="bulb" cx="270" cy="14" r="3.5"/>
+        <circle class="bulb" cx="330" cy="14" r="3.5"/>
+        <circle class="bulb" cx="390" cy="30" r="3.5"/>
+        <circle class="bulb" cx="450" cy="38" r="3.5"/>
+        <circle class="bulb" cx="510" cy="30" r="3.5"/>
+        <circle class="bulb" cx="570" cy="14" r="3.5"/>
+        <circle class="bulb" cx="630" cy="14" r="3.5"/>
+        <circle class="bulb" cx="690" cy="30" r="3.5"/>
+        <circle class="bulb" cx="750" cy="38" r="3.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <nav class="topnav">
+    <span class="topnav__brand">EventPay</span>
+    <div class="topnav__links" id="topnavLinks"></div>
+  </nav>
+
+  <main class="donors-page">
+    <section class="event-hero event-hero--tight">
+      <p class="event-hero__eyebrow">Contribute</p>
+      <h1 class="event-hero__title" id="donorsTitle">Bless the celebration</h1>
+    </section>
+
+    <!-- Goal progress -->
+    <section class="goal-panel" id="goalPanel" hidden>
+      <div class="goal-panel__row">
+        <span class="goal-panel__collected" id="goalCollected">₹0</span>
+        <span class="goal-panel__of" id="goalTarget"></span>
+      </div>
+      <div class="goal-bar"><div class="goal-bar__fill" id="goalBarFill"></div></div>
+      <p class="goal-panel__count" id="goalCount"></p>
+    </section>
+
+    <!-- Contribution form -->
+    <section class="card contribute-card">
+      <p class="contribute-card__label">Choose an amount</p>
+      <div class="chip-grid" id="quickAmounts"></div>
+
+      <form id="contributeForm" novalidate>
+        <div class="field">
+          <label for="amountInput">Amount</label>
+          <input type="number" id="amountInput" min="1" step="1" required>
+        </div>
+        <div class="field">
+          <label for="nameInput">Your name</label>
+          <input type="text" id="nameInput" required>
+        </div>
+        <div class="field">
+          <label for="villageInput">Village / relation (optional)</label>
+          <input type="text" id="villageInput">
+        </div>
+        <div class="field">
+          <label for="phoneInput">Phone</label>
+          <input type="tel" id="phoneInput" required>
+        </div>
+        <div class="field">
+          <label for="messageInput">Message (optional)</label>
+          <input type="text" id="messageInput" maxlength="140">
+        </div>
+        <button type="submit" id="contributeBtn" class="btn-primary">Contribute</button>
+      </form>
+    </section>
+
+    <!-- Donor list -->
+    <section class="donor-list-section">
+      <p class="donor-list-section__title">Blessed by</p>
+      <ul id="donorList" class="donor-list"></ul>
+      <p id="donorListEmpty" class="skeleton" hidden>Be the first to contribute.</p>
+    </section>
+  </main>
+
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/payment.js"></script>
+  <script src="js/donors.js"></script>
+</body>
+</html>

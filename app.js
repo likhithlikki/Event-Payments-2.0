@@ -81,3 +81,67 @@ function escapeHtml(text) {
   div.textContent = text || '';
   return div.innerHTML;
 }
+
+/**
+ * Formats a number as currency. Defaults to INR since that's the
+ * only gateway wired up so far, but takes the event's own Currency
+ * setting when available.
+ */
+function fmtCurrency(amount, currency = 'INR') {
+  const symbols = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+  const symbol = symbols[currency] || currency + ' ';
+  return symbol + Number(amount || 0).toLocaleString('en-IN');
+}
+
+/**
+ * Relative time string for donor list timestamps.
+ */
+function timeAgo(dateValue) {
+  const diffMs = Date.now() - new Date(dateValue).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+/**
+ * The nav items every event page shares. `toggle` names a Settings
+ * property that must be truthy for the link to show; null means the
+ * link always shows. Defined once here — every page calls
+ * renderTopNav() instead of building its own nav.
+ */
+const NAV_ITEMS = [
+  { page: 'home.html',    toggle: null,              icon: '🏠', label: 'Home',    desc: 'Event overview' },
+  { page: 'donors.html',  toggle: 'Show Donors',      icon: '🎁', label: 'Donors',  desc: 'See who\u2019s contributed' },
+  { page: 'gallery.html', toggle: 'Show Gallery',     icon: '📷', label: 'Gallery', desc: 'Photos from the day' },
+  { page: 'status.html',  toggle: 'Show Complaints',  icon: '📋', label: 'Status',  desc: 'Track a request' },
+  { page: 'support.html', toggle: null,              icon: '💬', label: 'Support', desc: 'Get help' },
+  { page: 'admin.html',   toggle: null,              icon: '🔑', label: 'Admin',   desc: 'Organizer login' }
+];
+
+function isSettingEnabled(settings, toggleName) {
+  if (!toggleName) return true;
+  const val = String((settings || {})[toggleName] || '').trim().toLowerCase();
+  return val === '' || val === 'true' || val === 'yes' || val === '1';
+}
+
+/**
+ * Renders the shared top nav into #topnavLinks, filtered by the
+ * current event's Settings toggles, with `activePage` highlighted.
+ */
+function renderTopNav(activePage) {
+  const container = document.getElementById('topnavLinks');
+  if (!container) return;
+  const settings = CURRENT_EVENT.settings || {};
+  container.innerHTML = '';
+
+  NAV_ITEMS.filter(item => isSettingEnabled(settings, item.toggle)).forEach(item => {
+    const a = document.createElement('a');
+    a.href = eventLink(item.page);
+    a.textContent = item.label;
+    if (item.page === activePage) a.classList.add('is-active');
+    container.appendChild(a);
+  });
+}
