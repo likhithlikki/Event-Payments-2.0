@@ -315,13 +315,35 @@ QUICK_AMTS.forEach(a => {
 });
 
 // ---- Initial data load ----
+// eventCode is the multi-tenant routing key withEvent() uses to find this
+// event's spreadsheet in MASTER_DB. It must come from the ?event= link the
+// organizer shared, or (on later visits) from localStorage.
+const CURRENT_EVENT_CODE = getEventCode();
+
+if (!CURRENT_EVENT_CODE) {
+  document.getElementById("formSection").innerHTML =
+    '<div class="card"><div class="card-title"><div class="icon">⚠️</div>Event link required</div>' +
+    '<p style="font-size:13px;color:var(--text-muted)">This page needs an event link to know which event to contribute to. ' +
+    'Please use the contribution link shared by the organizer (it looks like <code>index.html?event=WED26001</code>).</p></div>';
+  document.getElementById("proceedBtn") && (document.getElementById("proceedBtn").style.display = "none");
+  throw new Error("Missing event code — aborting page init");
+}
+
+const EC_QS = "&eventCode=" + encodeURIComponent(CURRENT_EVENT_CODE);
+
 Promise.all([
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings").then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicVisibility").then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats").then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getVillageSuggestions").then(r => r.json()).catch(() => ({ villages: [] })),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getRecentTransactions").then(r => r.json()).catch(() => ({ transactions: [] }))
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings" + EC_QS).then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicVisibility" + EC_QS).then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats" + EC_QS).then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getVillageSuggestions" + EC_QS).then(r => r.json()).catch(() => ({ villages: [] })),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getRecentTransactions" + EC_QS).then(r => r.json()).catch(() => ({ transactions: [] }))
 ]).then(([settings, vis, stats, vsug, rtx]) => {
+  if (settings.error) { showMsg("payMsg", "error", settings.error); return; }
+
+  // Cache the resolved code so donors.html / status.html / gallery.html
+  // (which read the same localStorage key) keep working without ?event= on every link.
+  setEventCode(CURRENT_EVENT_CODE);
+
   eventName = settings.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
   document.getElementById("eventTitle").textContent = eventName;
   document.getElementById("navEventName").textContent = eventName;
@@ -439,6 +461,15 @@ function completeProgress() {
 
 // ---- STEP 1 -> STEP 2: create the Razorpay order server-side, then show the Pay button ----
 function goToPayment() {
+  // Fail fast rather than silently sending eventCode="null" to the backend,
+  // which withEvent() would reject with "Event not found: NULL" and
+  // createRazorpayOrder() would never actually run.
+  const eventCode = CURRENT_EVENT_CODE || getEventCode();
+  if (!eventCode) {
+    showMsg("payMsg", "error", "Missing event reference. Please reload using the original contribution link.");
+    return;
+  }
+
   userData = {
     refid: generateRefID(),
     name: nameIn.value.trim(),
@@ -460,7 +491,7 @@ function goToPayment() {
 
   const params = new URLSearchParams({
     action: "createRazorpayOrder",
-    eventCode: getEventCode(),
+    eventCode: eventCode,
     amount: userData.amount,
     name: userData.name,
     village: userData.village,
@@ -533,7 +564,7 @@ function confirmPaymentWithServer(response) {
 
   const params = new URLSearchParams({
     action: "verifyPayment",
-    eventCode: getEventCode(),
+    eventCode: CURRENT_EVENT_CODE || getEventCode(),
     razorpay_order_id: response.razorpay_order_id,
     razorpay_payment_id: response.razorpay_payment_id,
     razorpay_signature: response.razorpay_signature
