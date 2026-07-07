@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Status · EventPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+  <div class="lights" aria-hidden="true">
+    <svg viewBox="0 0 800 64" preserveAspectRatio="none">
+      <path d="M0,8 C 100,50 200,50 300,8 S 500,50 600,8 S 800,50 800,8"
+            fill="none" stroke="#cda355" stroke-opacity="0.35" stroke-width="1.5"/>
+      <g fill="#e6c580">
+        <circle class="bulb" cx="30"  cy="14" r="3.5"/>
+        <circle class="bulb" cx="90"  cy="30" r="3.5"/>
+        <circle class="bulb" cx="150" cy="38" r="3.5"/>
+        <circle class="bulb" cx="210" cy="30" r="3.5"/>
+        <circle class="bulb" cx="270" cy="14" r="3.5"/>
+        <circle class="bulb" cx="330" cy="14" r="3.5"/>
+        <circle class="bulb" cx="390" cy="30" r="3.5"/>
+        <circle class="bulb" cx="450" cy="38" r="3.5"/>
+        <circle class="bulb" cx="510" cy="30" r="3.5"/>
+        <circle class="bulb" cx="570" cy="14" r="3.5"/>
+        <circle class="bulb" cx="630" cy="14" r="3.5"/>
+        <circle class="bulb" cx="690" cy="30" r="3.5"/>
+        <circle class="bulb" cx="750" cy="38" r="3.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <nav class="topnav">
+    <span class="topnav__brand">EventPay</span>
+    <div class="topnav__links" id="topnavLinks"></div>
+  </nav>
+
+  <main class="donors-page">
+    <section class="event-hero event-hero--tight">
+      <p class="event-hero__eyebrow">Status</p>
+      <h1 class="event-hero__title">Track a request</h1>
+    </section>
+
+    <div class="tabs" role="tablist" style="max-width:480px;margin:0 auto 22px;">
+      <button type="button" id="tabSubmit" class="tab" role="tab">Submit</button>
+      <button type="button" id="tabCheck" class="tab" role="tab">Check status</button>
+    </div>
+
+    <!-- Submit a complaint -->
+    <section class="card contribute-card" id="submitPanel" style="max-width:480px;margin:0 auto 24px;">
+      <p class="contribute-card__label">Tell us what happened</p>
+      <form id="submitForm" novalidate>
+        <div class="field">
+          <label for="cName">Your name</label>
+          <input type="text" id="cName" required>
+        </div>
+        <div class="field">
+          <label for="cPhone">Phone</label>
+          <input type="tel" id="cPhone" required>
+        </div>
+        <div class="field">
+          <label for="cVillage">Village / relation (optional)</label>
+          <input type="text" id="cVillage">
+        </div>
+        <div class="field">
+          <label for="cComplaint">What's the issue?</label>
+          <input type="text" id="cComplaint" required>
+        </div>
+        <button type="submit" id="submitComplaintBtn" class="btn-primary">Submit</button>
+      </form>
+    </section>
+
+    <!-- Check status -->
+    <section class="card contribute-card" id="checkPanel" style="max-width:480px;margin:0 auto 24px; display:none;">
+      <p class="contribute-card__label">Look up by phone number</p>
+      <form id="checkForm" novalidate>
+        <div class="field">
+          <label for="checkPhone">Phone</label>
+          <input type="tel" id="checkPhone" required>
+        </div>
+        <button type="submit" id="checkStatusBtn" class="btn-primary">Check status</button>
+      </form>
+      <ul id="complaintResults" class="donor-list" style="margin-top:18px;"></ul>
+      <p id="complaintResultsEmpty" class="skeleton" hidden>No requests found for that number.</p>
+    </section>
+  </main>
+
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/status.js"></script>
+</body>
+</html>

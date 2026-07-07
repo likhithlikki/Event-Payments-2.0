@@ -1,267 +1,391 @@
-// ════════════════════════════════════════════════════════════
-// EventPay 2.0 — Admin Dashboard Logic (admin.js)
-// Loaded by admin.html. Requires config.js (APP_CONFIG) to be loaded first.
-// ════════════════════════════════════════════════════════════
+/**
+ * admin.js
+ * ------------------------------------------------------------------
+ * One responsibility: the admin.html page. Logs in against THIS
+ * event's Admins sheet only (never a global admin list), then drives
+ * six lazily-loaded tabs, each calling exactly one admin* action per
+ * load: Complaints, Gallery (pending approval), Villages, Settings,
+ * Analytics, Payments. The session token lives in sessionStorage —
+ * same policy as the event code: never a Spreadsheet ID, clears when
+ * the tab closes.
+ * ------------------------------------------------------------------
+ */
 
-let ADMIN = {
-  token: localStorage.getItem("ep_admin_token"),
-  user: localStorage.getItem("ep_admin_user"),
-  role: localStorage.getItem("ep_admin_role"),
-  access: localStorage.getItem("ep_admin_access"),
-  scope: localStorage.getItem("ep_admin_scope"),
-  eventCode: localStorage.getItem("ep_admin_event") || "",
-  expiry: localStorage.getItem("ep_admin_expiry"),
-  editorMode: false
-};
+let adminSession = null; // { token, name, role }
+const loadedTabs = new Set();
 
-// ── Guard: redirect to login if no valid session ──
-(function guard(){
-  if (!ADMIN.token || !ADMIN.expiry || new Date(ADMIN.expiry) < new Date()) {
-    window.location.href = "admin-login.html";
-  }
-})();
-
-document.getElementById("welcomeMsg").textContent = "Hi, " + (ADMIN.user || "Admin");
-document.getElementById("roleBadge").textContent = (ADMIN.role || "viewer").toUpperCase() +
-  (ADMIN.eventCode ? " · " + ADMIN.eventCode : " · Platform");
-
-// Viewer-role accounts never get an Editor Mode option — read only.
-if (ADMIN.role === "viewer" || ADMIN.access === "view_only") {
-  document.getElementById("editorToggle").style.display = "none";
+function slugify_(text) {
+  return String(text || '').trim().toLowerCase().replace(/\s+/g, '-');
 }
 
-// ── API helper — always includes adminToken/eventCode ──
-function adminApi(action, extra = {}) {
-  const params = new URLSearchParams({
-    action,
-    adminToken: ADMIN.token,
-    adminUser: ADMIN.user,
-    adminExpiry: ADMIN.expiry,
-    eventCode: ADMIN.eventCode,
-    ...extra
-  });
-  return fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params }).then(r => r.json());
-}
+document.addEventListener('DOMContentLoaded', initAdminPage);
 
-function logout() {
-  localStorage.removeItem("ep_admin_token");
-  localStorage.removeItem("ep_admin_expiry");
-  localStorage.removeItem("ep_admin_user");
-  localStorage.removeItem("ep_admin_role");
-  localStorage.removeItem("ep_admin_access");
-  localStorage.removeItem("ep_admin_scope");
-  localStorage.removeItem("ep_admin_event");
-  window.location.href = "admin-login.html";
-}
+async function initAdminPage() {
+  try {
+    await loadCurrentEvent();
+    document.title = `Admin · ${CURRENT_EVENT.eventName || 'EventPay'}`;
+    renderTopNav('admin.html');
 
-function toast(msg, type = "info") {
-  const tc = document.getElementById("toastContainer");
-  const t = document.createElement("div");
-  t.className = "toast " + type;
-  t.textContent = msg;
-  tc.appendChild(t);
-  setTimeout(() => { t.classList.add("fade-out"); setTimeout(() => t.remove(), 300); }, 3200);
-}
+    document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+    document.getElementById('adminLogoutBtn').addEventListener('click', handleAdminLogout);
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+      btn.addEventListener('click', () => setAdminTab(btn.dataset.tab));
+    });
 
-// ── EDITOR MODE — required confirmation, matches "Mode 2" spec ──
-function toggleEditorMode() {
-  if (!ADMIN.editorMode) {
-    if (!confirm("Enable Editor Mode? Every change you make will require a reason and will be logged to the Audit Log.")) return;
-    ADMIN.editorMode = true;
-    const btn = document.getElementById("editorToggle");
-    btn.textContent = "✏️ Editor Mode ON";
-    btn.classList.add("on");
-    toast("Editor Mode enabled — changes are now logged", "warning");
-  } else {
-    ADMIN.editorMode = false;
-    const btn = document.getElementById("editorToggle");
-    btn.textContent = "🔒 View Mode";
-    btn.classList.remove("on");
-    toast("Back to View Mode", "info");
+    const stored = sessionStorage.getItem(adminStorageKey_());
+    if (stored) {
+      adminSession = JSON.parse(stored);
+      showDashboard();
+    }
+  } catch (err) {
+    toast(err.message, 'error');
   }
 }
 
-function requireReason(promptText) {
-  const reason = prompt(promptText || "Reason for this change (required):");
-  if (!reason || !reason.trim()) { toast("A reason is required — change cancelled", "error"); return null; }
-  return reason.trim();
+function adminStorageKey_() {
+  return `eventpay_admin_${CURRENT_EVENT.eventCode}`;
 }
 
-// ── PANEL SWITCHING ──
-function showPanel(name) {
-  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".side-item[data-panel]").forEach(s => s.classList.remove("active"));
-  document.getElementById("panel-" + name).classList.add("active");
-  const item = document.querySelector('.side-item[data-panel="' + name + '"]');
-  if (item) item.classList.add("active");
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  if (!username || !password) return toast('Enter your username and password.', 'warning');
 
-  if (name === "payments") loadPayments();
-  if (name === "complaints") loadComplaints();
-  if (name === "villages") loadVillages();
-  if (name === "settings") loadSettings();
-  if (name === "audit") loadAudit();
+  const btn = document.getElementById('adminLoginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Logging in…';
+  try {
+    const result = await api('adminLogin', { eventCode: CURRENT_EVENT.eventCode, username, password }, 'POST');
+    adminSession = result;
+    sessionStorage.setItem(adminStorageKey_(), JSON.stringify(adminSession));
+    document.getElementById('adminLoginForm').reset();
+    showDashboard();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  }
 }
 
-// ── OVERVIEW STATS ──
-function loadOverview() {
-  adminApi("getDashboardOverview").then(res => {
-    if (res.error) { toast(res.error, "error"); return; }
-    const grid = document.getElementById("statGrid");
-    grid.innerHTML = `
-      <div class="stat-box"><div class="lbl">Total Collected</div><div class="val">₹${Number(res.totalCollected||0).toLocaleString("en-IN")}</div></div>
-      <div class="stat-box"><div class="lbl">Paid Contributions</div><div class="val">${res.paidCount||0}</div></div>
-      <div class="stat-box"><div class="lbl">Pending Payments</div><div class="val">${res.pendingPayments||0}</div></div>
-      <div class="stat-box"><div class="lbl">Open Complaints</div><div class="val">${res.openComplaints||0}</div></div>
-      <div class="stat-box"><div class="lbl">Villages to Review</div><div class="val">${res.pendingVillages||0}</div></div>
-    `;
+async function handleAdminLogout() {
+  try {
+    if (adminSession) await api('adminLogout', { token: adminSession.token }, 'POST');
+  } catch (err) {
+    // token may already be expired — proceed with local logout regardless
+  }
+  adminSession = null;
+  loadedTabs.clear();
+  sessionStorage.removeItem(adminStorageKey_());
+  document.getElementById('adminDashboard').hidden = true;
+  document.getElementById('adminLoginCard').hidden = false;
+}
+
+function showDashboard() {
+  document.getElementById('adminLoginCard').hidden = true;
+  document.getElementById('adminDashboard').hidden = false;
+  document.getElementById('adminWelcome').textContent = `${adminSession.name} · ${adminSession.role}`;
+  if (adminSession.role === 'Viewer') {
+    const paymentsTab = document.querySelector('.admin-tab[data-tab="payments"]');
+    if (paymentsTab) paymentsTab.hidden = true;
+  }
+  setAdminTab('complaints');
+}
+
+/**
+ * Every admin API call goes through here so an expired token bounces
+ * the visitor back to the login form instead of showing a raw error
+ * on every tab.
+ */
+async function adminApi(action, params = {}, method = 'GET') {
+  try {
+    return await api(action, Object.assign({ token: adminSession.token, eventCode: CURRENT_EVENT.eventCode }, params), method);
+  } catch (err) {
+    if (/session/i.test(err.message)) {
+      toast('Your session expired. Please log in again.', 'warning');
+      handleAdminLogout();
+    }
+    throw err;
+  }
+}
+
+function setAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.toggle('is-active', btn.dataset.tab === tab));
+  document.querySelectorAll('.admin-panel').forEach(panel => {
+    panel.hidden = panel.id !== `panel-${tab}`;
+  });
+  if (!loadedTabs.has(tab)) {
+    loadedTabs.add(tab);
+    loadAdminTab(tab).catch(err => toast(err.message, 'error'));
+  }
+}
+
+function loadAdminTab(tab) {
+  switch (tab) {
+    case 'complaints': return loadComplaintsPanel();
+    case 'gallery': return loadGalleryPanel();
+    case 'villages': return loadVillagesPanel();
+    case 'settings': return loadSettingsPanel();
+    case 'analytics': return loadAnalyticsPanel();
+    case 'payments': return loadPaymentsPanel();
+  }
+}
+
+// ---------------------------------------------------------------
+// Complaints
+// ---------------------------------------------------------------
+
+async function loadComplaintsPanel() {
+  const panel = document.getElementById('panel-complaints');
+  panel.innerHTML = '<p class="skeleton">Loading complaints…</p>';
+  const { complaints } = await adminApi('adminGetComplaints');
+
+  if (!complaints.length) {
+    panel.innerHTML = '<p class="skeleton">No complaints yet.</p>';
+    return;
+  }
+
+  panel.innerHTML = complaints.map(c => `
+    <div class="admin-row" data-id="${escapeHtml(c['Complaint ID'])}">
+      <div class="admin-row__main">
+        <strong>${escapeHtml(c.Name)}</strong> · ${escapeHtml(c.Phone)}
+        <span class="status-badge status-badge--${escapeHtml(slugify_(c.Status))}">${escapeHtml(c.Status)}</span>
+        <p>${escapeHtml(c.Complaint)}</p>
+      </div>
+      <div class="admin-row__actions">
+        <input type="text" class="reply-input" placeholder="Reply…" value="${escapeHtml(c.Reply || '')}">
+        <select class="status-select">
+          ${['Open', 'In Progress', 'Resolved'].map(s => `<option value="${s}" ${s === c.Status ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+        <button type="button" class="btn-secondary save-complaint-btn">Save</button>
+      </div>
+    </div>
+  `).join('');
+
+  panel.querySelectorAll('.save-complaint-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.admin-row');
+      const complaintId = row.dataset.id;
+      const reply = row.querySelector('.reply-input').value.trim();
+      const status = row.querySelector('.status-select').value;
+      btn.disabled = true;
+      try {
+        await adminApi('adminReplyComplaint', { complaintId, reply, status }, 'POST');
+        toast('Saved.', 'success');
+        loadedTabs.delete('complaints');
+        loadComplaintsPanel();
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
   });
 }
 
-// ── PAYMENTS ──
-function loadPayments() {
-  const el = document.getElementById("paymentsTable");
-  el.textContent = "Loading...";
-  adminApi("getPayments").then(res => {
-    if (res.error) { el.textContent = res.error; return; }
-    const rows = res.payments || [];
-    if (!rows.length) { el.innerHTML = "<p style='font-size:13px;color:var(--text-muted)'>No payments yet.</p>"; return; }
-    el.innerHTML = `<table class="data-table"><thead><tr>
-      <th>Name</th><th>Village</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date</th>
-    </tr></thead><tbody>${rows.map(r => `
-      <tr><td>${r.Name||""}</td><td>${r.Village||""}</td><td>${r.Phone||""}</td>
-      <td>₹${Number(r.Amount||0).toLocaleString("en-IN")}</td>
-      <td><span class="pill ${String(r.PaymentStatus||"").toLowerCase()==="paid"?"approved":"pending"}">${r.PaymentStatus||""}</span></td>
-      <td>${r.PaymentDate||""}</td></tr>`).join("")}</tbody></table>`;
+// ---------------------------------------------------------------
+// Gallery moderation
+// ---------------------------------------------------------------
+
+async function loadGalleryPanel() {
+  const panel = document.getElementById('panel-gallery');
+  panel.innerHTML = '<p class="skeleton">Loading pending photos…</p>';
+  const { photos } = await adminApi('adminGetPendingPhotos');
+
+  if (!photos.length) {
+    panel.innerHTML = '<p class="skeleton">No photos waiting for approval.</p>';
+    return;
+  }
+
+  panel.innerHTML = `<div class="gallery-grid">${photos.map(p => `
+    <div class="gallery-tile" data-id="${escapeHtml(p['Photo ID'])}">
+      <img src="${escapeHtml(p['Thumbnail'] || p['Image URL'])}" alt="">
+      <div class="admin-row__actions" style="padding:8px;">
+        <button type="button" class="btn-secondary approve-btn">Approve</button>
+        <button type="button" class="btn-secondary reject-btn">Reject</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+
+  panel.querySelectorAll('.approve-btn').forEach(btn => {
+    btn.addEventListener('click', () => moderatePhoto_(btn, 'adminApprovePhoto'));
+  });
+  panel.querySelectorAll('.reject-btn').forEach(btn => {
+    btn.addEventListener('click', () => moderatePhoto_(btn, 'adminRejectPhoto'));
   });
 }
 
-// ── COMPLAINTS ──
-function loadComplaints() {
-  const el = document.getElementById("complaintsTable");
-  el.textContent = "Loading...";
-  adminApi("getComplaints").then(res => {
-    if (res.error) { el.textContent = res.error; return; }
-    const rows = res.complaints || [];
-    if (!rows.length) { el.innerHTML = "<p style='font-size:13px;color:var(--text-muted)'>No complaints yet.</p>"; return; }
-    el.innerHTML = `<table class="data-table"><thead><tr>
-      <th>Name</th><th>Village</th><th>Complaint</th><th>Status</th><th>Actions</th>
-    </tr></thead><tbody>${rows.map(r => `
-      <tr><td>${r.Name||""}</td><td>${r.Village||""}</td>
-      <td style="max-width:280px">${(r.Complaint||"").slice(0,120)}</td>
-      <td><span class="pill ${String(r.Status||"").toLowerCase()==="resolved"?"approved":"pending"}">${r.Status||"Open"}</span></td>
-      <td>
-        <button class="small-btn" onclick="resolveComplaint(${r._row})">Resolve</button>
-      </td></tr>`).join("")}</tbody></table>`;
-  });
+async function moderatePhoto_(btn, action) {
+  const tile = btn.closest('.gallery-tile');
+  const photoId = tile.dataset.id;
+  btn.disabled = true;
+  try {
+    await adminApi(action, { photoId }, 'POST');
+    tile.remove();
+  } catch (err) {
+    toast(err.message, 'error');
+    btn.disabled = false;
+  }
 }
 
-function resolveComplaint(row) {
-  if (ADMIN.editorMode !== true) { toast("Enable Editor Mode to make changes", "warning"); return; }
-  const reason = requireReason("Reason for resolving this complaint:");
-  if (!reason) return;
-  adminApi("updateComplaint", { row, status: "Resolved", reason }).then(res => {
-    if (res.error) toast(res.error, "error");
-    else { toast("Complaint resolved", "success"); loadComplaints(); }
-  });
-}
+// ---------------------------------------------------------------
+// Villages
+// ---------------------------------------------------------------
 
-// ── VILLAGES ──
-function loadVillages() {
-  const el = document.getElementById("villagesList");
-  el.textContent = "Loading...";
-  adminApi("getVillagesForReview").then(res => {
-    if (res.error) { el.textContent = res.error; return; }
-    const rows = res.villages || [];
-    if (!rows.length) { el.innerHTML = "<p style='font-size:13px;color:var(--text-muted)'>No villages recorded yet.</p>"; return; }
-    el.innerHTML = rows.map(v => `
-      <div class="village-row">
-        <div><strong>${v.village}</strong> <span style="color:var(--text-dim);font-size:11px">(${v.count} contribution${v.count==1?"":"s"})</span></div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="pill ${String(v.status).toLowerCase()}">${v.status}</span>
-          <button class="small-btn" onclick="approveVillageRow(${v._row})">Approve</button>
-          <button class="small-btn" onclick="mergeVillageRow(${v._row})">Merge into...</button>
-          <button class="small-btn" onclick="rejectVillageRow(${v._row})">Reject</button>
+async function loadVillagesPanel() {
+  const panel = document.getElementById('panel-villages');
+  panel.innerHTML = '<p class="skeleton">Loading villages…</p>';
+  const { villages } = await adminApi('adminGetVillages');
+
+  panel.innerHTML = `
+    <form id="addVillageForm" class="admin-row" style="gap:8px;">
+      <input type="text" id="newVillageName" placeholder="Add a village name">
+      <button type="button" class="btn-secondary" id="addVillageBtn">Add</button>
+    </form>
+    <div id="villageList">
+      ${villages.map(v => `
+        <div class="admin-row" data-id="${escapeHtml(v['Village ID'])}">
+          <span>${escapeHtml(v['Village Name'])}</span>
+          <span class="status-badge status-badge--${String(v.Status).toLowerCase()}">${escapeHtml(v.Status)}</span>
+          <button type="button" class="btn-secondary toggle-village-btn">
+            ${String(v.Status).toLowerCase() === 'active' ? 'Deactivate' : 'Activate'}
+          </button>
         </div>
-      </div>`).join("");
+      `).join('') || '<p class="skeleton">No villages yet.</p>'}
+    </div>
+  `;
+
+  document.getElementById('addVillageBtn').addEventListener('click', async () => {
+    const input = document.getElementById('newVillageName');
+    const villageName = input.value.trim();
+    if (!villageName) return;
+    try {
+      await adminApi('adminAddVillage', { villageName }, 'POST');
+      input.value = '';
+      loadedTabs.delete('villages');
+      loadVillagesPanel();
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  });
+
+  panel.querySelectorAll('.toggle-village-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.admin-row');
+      const villageId = row.dataset.id;
+      const isActive = btn.textContent.trim() === 'Deactivate';
+      try {
+        await adminApi('adminUpdateVillageStatus', { villageId, status: isActive ? 'Inactive' : 'Active' }, 'POST');
+        loadedTabs.delete('villages');
+        loadVillagesPanel();
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+    });
   });
 }
 
-function approveVillageRow(row) {
-  if (!ADMIN.editorMode) { toast("Enable Editor Mode to make changes", "warning"); return; }
-  const reason = requireReason("Reason for approving this village:");
-  if (!reason) return;
-  adminApi("approveVillage", { row, status: "Approved", reason }).then(res => {
-    if (res.error) toast(res.error, "error"); else { toast("Village approved", "success"); loadVillages(); }
-  });
-}
-function rejectVillageRow(row) {
-  if (!ADMIN.editorMode) { toast("Enable Editor Mode to make changes", "warning"); return; }
-  const reason = requireReason("Reason for rejecting this village entry:");
-  if (!reason) return;
-  adminApi("approveVillage", { row, status: "Rejected", reason }).then(res => {
-    if (res.error) toast(res.error, "error"); else { toast("Village rejected", "success"); loadVillages(); }
-  });
-}
-function mergeVillageRow(row) {
-  if (!ADMIN.editorMode) { toast("Enable Editor Mode to make changes", "warning"); return; }
-  const mergeInto = prompt("Merge this spelling into which existing village name? (type the correct spelling exactly)");
-  if (!mergeInto || !mergeInto.trim()) return;
-  const reason = requireReason("Reason for this merge:");
-  if (!reason) return;
-  adminApi("renameVillage", { row, mergeInto: mergeInto.trim(), reason }).then(res => {
-    if (res.error) toast(res.error, "error"); else { toast("Merged — past records updated too", "success"); loadVillages(); }
-  });
-}
+// ---------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------
 
-// ── SETTINGS ──
-const SETTINGS_FIELDS = [
-  ["EventName","Event Name"], ["BrideName","Bride Name"], ["GroomName","Groom Name"],
-  ["Venue","Venue"], ["GoogleMapsLink","Google Maps Link"], ["EventDate","Event Date"],
-  ["GoalAmount","Goal Amount (₹)"], ["MIN_AMOUNT","Minimum Contribution (₹)"], ["MAX_AMOUNT","Maximum Contribution (₹, 0 = no max)"]
-];
+function loadSettingsPanel() {
+  const panel = document.getElementById('panel-settings');
+  const settings = CURRENT_EVENT.settings || {};
+  const keys = Object.keys(settings);
 
-function loadSettings() {
-  const el = document.getElementById("settingsForm");
-  el.textContent = "Loading...";
-  adminApi("getSettings").then(s => {
-    if (s.error) { el.textContent = s.error; return; }
-    el.innerHTML = SETTINGS_FIELDS.map(([key,label]) => `
-      <div class="form-group" style="margin-bottom:12px">
-        <label class="form-label">${label}</label>
-        <div style="display:flex;gap:8px">
-          <input class="form-input" id="set_${key}" value="${(s[key]!==undefined?s[key]:"")}">
-          <button class="small-btn" onclick="saveSetting('${key}')">Save</button>
+  panel.innerHTML = `
+    <form id="settingsForm">
+      ${keys.map(key => `
+        <div class="field">
+          <label for="set-${escapeHtml(key)}">${escapeHtml(key)}</label>
+          <input type="text" id="set-${escapeHtml(key)}" data-key="${escapeHtml(key)}" value="${escapeHtml(settings[key])}">
         </div>
-      </div>`).join("");
+      `).join('')}
+      <button type="button" class="btn-primary" id="saveSettingsBtn">Save settings</button>
+    </form>
+  `;
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+    const updates = {};
+    panel.querySelectorAll('[data-key]').forEach(input => { updates[input.dataset.key] = input.value; });
+    const btn = document.getElementById('saveSettingsBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      await adminApi('adminUpdateSettings', { updates: JSON.stringify(updates) }, 'POST');
+      await loadCurrentEvent();
+      toast('Settings saved.', 'success');
+    } catch (err) {
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save settings';
+    }
   });
 }
 
-function saveSetting(key) {
-  if (!ADMIN.editorMode) { toast("Enable Editor Mode to make changes", "warning"); return; }
-  const value = document.getElementById("set_" + key).value;
-  const reason = requireReason("Reason for changing " + key + ":");
-  if (!reason) return;
-  adminApi("updateSettings", { field: key, value, reason }).then(res => {
-    if (res.error) toast(res.error, "error"); else toast(key + " updated", "success");
-  });
+// ---------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------
+
+async function loadAnalyticsPanel() {
+  const panel = document.getElementById('panel-analytics');
+  panel.innerHTML = '<p class="skeleton">Loading analytics…</p>';
+  const data = await adminApi('adminGetAnalytics');
+
+  panel.innerHTML = `
+    <div class="feature-grid">
+      <div class="feature-card"><span class="feature-card__label">Total Payments</span><span class="feature-card__desc">${data.TotalPayments}</span></div>
+      <div class="feature-card"><span class="feature-card__label">Total Amount</span><span class="feature-card__desc">${fmtCurrency(data.TotalAmount)}</span></div>
+      <div class="feature-card"><span class="feature-card__label">Average Donation</span><span class="feature-card__desc">${fmtCurrency(data.AverageDonation)}</span></div>
+      <div class="feature-card"><span class="feature-card__label">Highest Donation</span><span class="feature-card__desc">${fmtCurrency(data.HighestDonation)}</span></div>
+      <div class="feature-card"><span class="feature-card__label">Lowest Donation</span><span class="feature-card__desc">${fmtCurrency(data.LowestDonation)}</span></div>
+    </div>
+  `;
 }
 
-// ── AUDIT LOG ──
-function loadAudit() {
-  const el = document.getElementById("auditTable");
-  el.textContent = "Loading...";
-  adminApi("getAuditLog").then(res => {
-    if (res.error) { el.textContent = res.error; return; }
-    const rows = res.log || [];
-    if (!rows.length) { el.innerHTML = "<p style='font-size:13px;color:var(--text-muted)'>No audit entries yet.</p>"; return; }
-    el.innerHTML = `<table class="data-table"><thead><tr>
-      <th>Time</th><th>Admin</th><th>Action</th><th>Field</th><th>Old</th><th>New</th><th>Reason</th>
-    </tr></thead><tbody>${rows.map(r => `
-      <tr><td>${r.Timestamp||""}</td><td>${r.Admin||""}</td><td>${r.Action||""}</td>
-      <td>${r.Field||""}</td><td>${r["Old Value"]!==undefined?r["Old Value"]:(r.OldValue||"")}</td>
-      <td>${r["New Value"]!==undefined?r["New Value"]:(r.NewValue||"")}</td><td>${r.Reason||""}</td></tr>`).join("")}</tbody></table>`;
-  });
+// ---------------------------------------------------------------
+// Payments
+// ---------------------------------------------------------------
+
+async function loadPaymentsPanel() {
+  const panel = document.getElementById('panel-payments');
+  if (adminSession.role === 'Viewer') {
+    panel.innerHTML = '<p class="skeleton">Your role cannot view payment details.</p>';
+    return;
+  }
+  panel.innerHTML = '<p class="skeleton">Loading payments…</p>';
+  const { payments } = await adminApi('adminGetPayments');
+
+  if (!payments.length) {
+    panel.innerHTML = '<p class="skeleton">No payments yet.</p>';
+    return;
+  }
+
+  panel.innerHTML = `
+    <button type="button" class="btn-secondary" id="exportCsvBtn" style="margin-bottom:14px;">Export CSV</button>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead><tr>${Object.keys(payments[0]).map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+        <tbody>${payments.map(p => `<tr>${Object.values(p).map(v => `<td>${escapeHtml(String(v))}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('exportCsvBtn').addEventListener('click', () => exportPaymentsCsv_(payments));
 }
 
-// ── INIT ──
-loadOverview();
+function exportPaymentsCsv_(payments) {
+  const headers = Object.keys(payments[0]);
+  const rows = payments.map(p => headers.map(h => `"${String(p[h]).replace(/"/g, '""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${CURRENT_EVENT.eventCode || 'payments'}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
