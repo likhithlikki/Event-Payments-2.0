@@ -4,10 +4,10 @@
 
 const EP = {
   // ── Replace with your deployed Apps Script URL ──
-  API: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
+  API: "https://script.google.com/macros/s/AKfycbwMZ6MBtAg-9oB_vMMn_ITf8FFVX17z3h-FubJp12Wec8Bljt5ZTpTA8iZ7s2AZ1JJ5/exec",
 
   // ── Razorpay Key (public) ──
-  RAZORPAY_KEY: "rzp_live_YOUR_KEY",
+  RAZORPAY_KEY: "rzp_test_T340E8hdWGxGrf",
 
   // ── App Info ──
   APP_NAME: "EventPay",
