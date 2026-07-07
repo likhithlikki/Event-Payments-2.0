@@ -501,9 +501,9 @@ function backToForm(){
 </footer>
 <div class="toast-container" id="toastContainer"></div>
 
-config.js"></script>
+<script src="config.js"></script>
 <script>
-let userData={}, upiLink="", upiID="", eventName="Event", villages=[], utrCheckTimer=null;
+
 const QUICK_AMTS = [101, 251, 501, 1001, 2001, 5001];
 
 // Build quick amount buttons
@@ -517,9 +517,9 @@ QUICK_AMTS.forEach(a => {
 Promise.all([
   fetch(APP_CONFIG.SCRIPT_URL+"?action=getSettings").then(r=>r.json()).catch(()=>({})),
   fetch(APP_CONFIG.SCRIPT_URL+"?action=getPublicVisibility").then(r=>r.json()).catch(()=>({})),
-  fetch(APP_CONFIG.SCRIPT_URL+"?action=getPublicStats").then(r=>r.json()).catch(()=>({})),
-  fetch(APP_CONFIG.SCRIPT_URL+"?action=getVillageSuggestions").then(r=>r.json()).catch(()=>({villages:[]})),
-  fetch(APP_CONFIG.SCRIPT_URL+"?action=getRecentTransactions").then(r=>r.json()).catch(()=>({transactions:[]}))
+  fetch(APP_.SCRIPT_URL+"?action=getPublicStats").then(r=>r.json()).catch(()=>({})),
+  fetch(APP_.SCRIPT_URL+"?action=getVillageSuggestions").then(r=>r.json()).catch(()=>({villages:[]})),
+  fetch(APP_.SCRIPT_URL+"?action=getRecentTransactions").then(r=>r.json()).catch(()=>({transactions:[]}))
 ]).then(([settings, vis, stats, vsug, rtx])=>{
   upiID = settings.UPI_ID || APP_CONFIG.UPI_ID || "";
   eventName = settings.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
