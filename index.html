@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="stylesheet" href="shared.css">
 <style>
 .hero-banner {
@@ -65,12 +66,10 @@
 .card-title { font-size:17px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
 .card-title .icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
 
-/* AMOUNT QUICK BUTTONS */
 .amount-quick { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
 .aq-btn { padding:7px 14px; border-radius:9px; border:1.5px solid var(--border2); background:var(--surface2); color:var(--text-muted); font-family:'Sora',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; }
 .aq-btn:hover,.aq-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(99,102,241,0.1); }
 
-/* VILLAGE AUTOCOMPLETE */
 .village-autocomplete-wrap { position:relative; }
 .village-dropdown { position:absolute; top:100%; left:0; right:0; z-index:200; background:var(--surface); border:1.5px solid var(--border2); border-radius:12px; max-height:180px; overflow-y:auto; box-shadow:var(--card-shadow); margin-top:4px; display:none; }
 .village-dropdown.open { display:block; }
@@ -82,26 +81,11 @@
 .proceed-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px var(--accent-glow); }
 .proceed-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-/* UTR RISK */
-.utr-risk-bar { margin-top:8px; display:none; }
-.utr-risk-bar.show { display:block; animation:fadeIn 0.3s ease; }
-
-/* PAYMENT SECTION */
 #paymentSection { display:none; }
-.qr-wrapper { text-align:center; padding:16px; }
-.qr-container { display:inline-block; padding:14px; background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.2); position:relative; }
-.qr-pulse { position:absolute; inset:-4px; border-radius:20px; border:2px solid var(--accent); animation:pulse-ring 2s infinite; pointer-events:none; }
-@keyframes pulse-ring { 0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:0.2;transform:scale(1.03)} }
 .amount-badge { display:inline-block; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; padding:5px 18px; border-radius:20px; font-size:17px; font-weight:700; margin-bottom:14px; font-family:'JetBrains Mono',monospace; }
-.upi-apps { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0; }
-.upi-app-btn { display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Sora',sans-serif; }
-.upi-app-btn:hover { border-color:var(--accent); background:rgba(99,102,241,0.08); transform:translateY(-1px); }
-.divider-text { text-align:center; color:var(--text-muted); font-size:12px; font-weight:600; margin:14px 0; position:relative; }
-.divider-text::before,.divider-text::after { content:''; position:absolute; top:50%; width:38%; height:1px; background:var(--border); }
-.divider-text::before{left:0;} .divider-text::after{right:0;}
-.utr-note { background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:11px; font-size:12px; color:#fbbf24; margin-bottom:14px; display:flex; gap:8px; align-items:flex-start; }
 .finish-btn { width:100%; padding:14px; background:linear-gradient(135deg,#10b981,#059669); color:white; border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:8px; }
-.finish-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.4); }
+.finish-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.4); }
+.finish-btn:disabled { opacity:0.5; cursor:not-allowed; }
 .back-link { display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:14px; cursor:pointer; margin-bottom:16px; width:fit-content; transition:color 0.2s; }
 .back-link:hover { color:var(--accent); }
 .msg-box { padding:12px 14px; border-radius:12px; font-size:13px; font-weight:500; margin-bottom:14px; display:none; animation:fadeIn 0.3s ease; }
@@ -109,8 +93,8 @@
 .msg-box.success { background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10b981; }
 .msg-box.error   { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; }
 .msg-box.warning { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); color:#fbbf24; }
+.msg-box.info    { background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.3); color:#6366f1; }
 
-/* RECEIPT */
 #receiptSection { display:none; }
 .receipt-card { background:white; color:#1a1a2e; border-radius:20px; padding:24px 20px; max-width:380px; margin:0 auto; font-family:'Sora',sans-serif; }
 .receipt-header { text-align:center; border-bottom:2px dashed #e2e8f0; padding-bottom:16px; margin-bottom:16px; }
@@ -132,7 +116,6 @@
 .download-btn { width:100%; padding:13px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-top:14px; transition:all 0.3s; display:flex; align-items:center; justify-content:center; gap:8px; max-width:420px; margin-left:auto; margin-right:auto; box-sizing:border-box; }
 .download-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(99,102,241,0.4); }
 
-/* RECENT TRANSACTIONS */
 .recent-section { max-width:440px; margin:28px auto 0; padding:0 16px; }
 .rtx-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:10px; }
 .rtx-item { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; gap:10px; }
@@ -238,235 +221,30 @@
     </div>
   </div>
 
-  <!-- PAYMENT -->
-  <!-- <div id="paymentSection">
+  <!-- PAYMENT (Razorpay Checkout only — no QR/UPI) -->
+  <div id="paymentSection">
     <div class="card">
       <div class="back-link" onclick="backToForm()">← Back to Details</div>
-      <div class="card-title"><div class="icon">📲</div>Scan &amp; Pay</div>
-      <div class="qr-wrapper">
-        <div class="qr-container"><div id="qrcode"></div><div class="qr-pulse"></div></div>
+      <div class="card-title"><div class="icon">💳</div>Complete Payment</div>
+
+      <div style="text-align:center;padding:8px 0 18px">
         <div class="amount-badge" id="amountBadge">₹0</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:10px">
+          Clicking below opens Razorpay's secure payment window. Pay by card, UPI,
+          wallet, or netbanking — whatever you have configured in your Razorpay account.
+        </p>
       </div>
-      <div class="upi-apps">
-        <button class="upi-app-btn" onclick="openUPI('phonepe')">📱 PhonePe</button>
-        <button class="upi-app-btn" onclick="openUPI('gpay')">💚 GPay</button>
-        <button class="upi-app-btn" onclick="openUPI('paytm')">💙 Paytm</button>
-        <button class="upi-app-btn" onclick="openUPI('bhim')">🇮🇳 BHIM</button>
-      </div>
-      <div class="divider-text">After payment, enter UTR below</div>
-      <div class="utr-note">⚠️ <span>Enter the 12-digit UTR / Transaction ID from your payment app after successful payment.</span></div>
-      <div class="form-group">
-        <label class="form-label">UTR / Transaction Reference</label>
-        <input class="form-input" type="text" id="utr" placeholder="e.g. 423819874512" maxlength="30" oninput="checkUTRRisk(this.value)">
-        <div class="utr-risk-bar" id="utrRiskBar"><div class="utr-risk-label" id="utrRiskLabel">Checking...</div></div>
-      </div>
+
       <div id="payMsg" class="msg-box"></div>
       <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
-      <button class="finish-btn" id="finishBtn" onclick="finishPayment()">✓ Confirm Payment</button>
-    </div>
-  </div> -->
 
-
-
-
-  <!-- ════════════════════════════════════════════════════════════
-     REPLACEMENT #1 — <head> script tags
-     In your existing index.html <head>, DELETE this line (no longer needed):
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-     and ADD this one instead (Razorpay's Checkout.js — required, loads their payment popup):
-════════════════════════════════════════════════════════════ -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-
-<!-- ════════════════════════════════════════════════════════════
-     REPLACEMENT #2 — the #paymentSection div
-     Replace your ENTIRE existing <div id="paymentSection">...</div> block with this:
-════════════════════════════════════════════════════════════ -->
-<div id="paymentSection">
-  <div class="card">
-    <div class="back-link" onclick="backToForm()">← Back to Details</div>
-    <div class="card-title"><div class="icon">💳</div>Complete Payment</div>
-
-    <div style="text-align:center;padding:8px 0 18px">
-      <div class="amount-badge" id="amountBadge">₹0</div>
-      <p style="font-size:12px;color:var(--text-muted);margin-top:10px">
-        Clicking below opens Razorpay's secure payment window. Pay by card, UPI,
-        wallet, or netbanking — whatever you have configured in your Razorpay account.
+      <button class="finish-btn" id="payNowBtn" onclick="openRazorpayCheckout()">🔒 Pay ₹<span id="payNowAmt">0</span> Now</button>
+      <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px">
+        Your payment is processed entirely by Razorpay. EventPay never sees or stores your card, UPI PIN, or bank details.
       </p>
     </div>
-
-    <div id="payMsg" class="msg-box"></div>
-    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
-
-    <button class="finish-btn" id="payNowBtn" onclick="openRazorpayCheckout()">🔒 Pay ₹<span id="payNowAmt">0</span> Now</button>
-    <p style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:10px">
-      Your payment is processed entirely by Razorpay. EventPay never sees or stores your card, UPI PIN, or bank details.
-    </p>
   </div>
-</div>
 
-
-<!-- ════════════════════════════════════════════════════════════
-     REPLACEMENT #3 — JavaScript
-     In your existing <script> block:
-       • DELETE these functions entirely: goToPayment(), openUPI(), checkUTRRisk(), finishPayment()
-       • DELETE the "let upiLink=..., utrCheckTimer=null" bits related to UPI/UTR from the
-         top-level `let userData={}, upiLink="", upiID="", ...` line — replace that whole
-         line with the simplified one below
-       • KEEP: showReceipt(), downloadReceipt(), validate(), setStep(), showMsg(),
-         showProgress()/completeProgress(), village autocomplete, everything else
-     ADD the functions below in their place:
-════════════════════════════════════════════════════════════ -->
-<script>
-// Simplified state — no more upiLink / upiID / utrCheckTimer needed
-let userData = {}, eventName = "Event", villages = [];
-
-function generateRefID(){ return "EP"+Date.now().toString().slice(-10); }
-function setStep(n){[1,2,3].forEach(i=>{const e=document.getElementById("step"+i);e.classList.remove("active","done");if(i<n)e.classList.add("done");if(i===n)e.classList.add("active");});}
-
-// STEP 1 -> STEP 2: create the Razorpay order server-side, then show the Pay button
-function goToPayment(){
-  userData = {
-    refid: generateRefID(),
-    name: nameIn.value.trim(),
-    village: villageIn.value.trim(),
-    phone: phoneIn.value.trim(),
-    amount: amountIn.value.trim()
-  };
-
-  document.getElementById("formSection").style.display = "none";
-  document.getElementById("paymentSection").style.display = "block";
-  document.getElementById("amountBadge").textContent = "₹" + Number(userData.amount).toLocaleString("en-IN");
-  document.getElementById("payNowAmt").textContent = Number(userData.amount).toLocaleString("en-IN");
-  setStep(2);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  document.getElementById("payNowBtn").disabled = true;
-  showProgress();
-
-  const params = new URLSearchParams({
-    action: "createRazorpayOrder",
-    eventCode: getEventCode(),
-    amount: userData.amount,
-    name: userData.name,
-    village: userData.village,
-    phone: userData.phone
-  });
-
-  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
-    .then(r => r.json())
-    .then(res => {
-      completeProgress();
-      document.getElementById("payNowBtn").disabled = false;
-      if (res.error) {
-        showMsg("payMsg", "error", res.error);
-        return;
-      }
-      userData.orderId = res.orderId;
-      userData.razorpayKeyId = res.keyId;
-      userData.orderAmount = res.amount; // paise
-    })
-    .catch(() => {
-      completeProgress();
-      document.getElementById("payNowBtn").disabled = false;
-      showMsg("payMsg", "error", "Could not start payment. Please try again.");
-    });
-}
-
-// STEP 2: open Razorpay's own Checkout popup
-function openRazorpayCheckout(){
-  if (!userData.orderId) {
-    showMsg("payMsg", "error", "Payment session not ready yet. Please wait a moment and try again.");
-    return;
-  }
-  const options = {
-    key: userData.razorpayKeyId,           // public Key ID only — no secret ever touches the browser
-    amount: userData.orderAmount,
-    currency: "INR",
-    name: eventName,
-    description: "Contribution — " + userData.name,
-    order_id: userData.orderId,
-    prefill: {
-      name: userData.name,
-      contact: userData.phone,
-      email: document.getElementById("email") ? document.getElementById("email").value : ""
-    },
-    theme: { color: "#f5c842" },
-    handler: function (response) {
-      // response = { razorpay_payment_id, razorpay_order_id, razorpay_signature }
-      confirmPaymentWithServer(response);
-    },
-    modal: {
-      ondismiss: function () {
-        showMsg("payMsg", "warning", "Payment window closed. You can try again anytime.");
-      }
-    }
-  };
-  const rzp = new Razorpay(options);
-  rzp.on("payment.failed", function (resp) {
-    showMsg("payMsg", "error", "Payment failed: " + (resp.error && resp.error.description || "please try again"));
-  });
-  rzp.open();
-}
-
-// After Razorpay's popup succeeds, ask the server to independently verify
-// (signature recheck + live Razorpay API status check) before trusting it.
-function confirmPaymentWithServer(response){
-  document.getElementById("payNowBtn").disabled = true;
-  showProgress();
-  showMsg("payMsg", "info", "Confirming your payment...");
-
-  const params = new URLSearchParams({
-    action: "verifyPayment",
-    eventCode: getEventCode(),
-    razorpay_order_id: response.razorpay_order_id,
-    razorpay_payment_id: response.razorpay_payment_id,
-    razorpay_signature: response.razorpay_signature
-  });
-
-  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
-    .then(r => r.json())
-    .then(res => {
-      completeProgress();
-      document.getElementById("payNowBtn").disabled = false;
-      if (res.success) {
-        showMsg("payMsg", "success", "Payment confirmed!");
-        setTimeout(() => showReceipt(response.razorpay_payment_id), 500);
-      } else {
-        showMsg("payMsg", "error", res.error || "We couldn't confirm this payment. Contact support with your name and phone number — do not pay again.");
-      }
-    })
-    .catch(() => {
-      completeProgress();
-      document.getElementById("payNowBtn").disabled = false;
-      showMsg("payMsg", "error", "Connection error while confirming payment. If money was deducted, contact support — do not pay again.");
-    });
-}
-
-function backToForm(){
-  document.getElementById("paymentSection").style.display = "none";
-  document.getElementById("formSection").style.display = "block";
-  setStep(1);
-}
-</script>
-
-
-<!-- ════════════════════════════════════════════════════════════
-     REPLACEMENT #4 — showReceipt()
-     Your existing showReceipt(utr) function reads document.getElementById("r_utr").
-     Replace that one line (r_utr) with a Razorpay Payment ID field instead —
-     there is no UTR in this flow anymore.
-════════════════════════════════════════════════════════════ -->
-<script>
-// Inside showReceipt(paymentId) — replace the old:
-//   document.getElementById("r_utr").textContent = utr;
-// with:
-//   document.getElementById("r_utr").textContent = paymentId;
-// (You can also relabel the receipt row from "UTR No." to "Payment ID" in the HTML.)
-</script>
-
-
-  
   <!-- RECEIPT -->
   <div id="receiptSection">
     <div id="receipt" class="receipt-card">
@@ -475,7 +253,7 @@ function backToForm(){
       <div class="receipt-row"><span class="key">Name</span><span class="val" id="r_name">—</span></div>
       <div class="receipt-row"><span class="key">Village</span><span class="val" id="r_village">—</span></div>
       <div class="receipt-row"><span class="key">Phone</span><span class="val" id="r_phone">—</span></div>
-      <div class="receipt-row"><span class="key">UTR No.</span><span class="val" id="r_utr">—</span></div>
+      <div class="receipt-row"><span class="key">Payment ID</span><span class="val" id="r_utr">—</span></div>
       <div class="receipt-row"><span class="key">Date &amp; Time</span><span class="val" id="r_datetime">—</span></div>
       <div class="receipt-row"><span class="key">Status</span><span class="val"><span class="receipt-status-badge status-pending" id="r_status">⏳ Pending</span></span></div>
       <div class="ref-badge"><div class="ref-label">Reference ID (save this!)</div><div class="ref-id" id="r_refid">—</div></div>
@@ -503,197 +281,336 @@ function backToForm(){
 
 <script src="config.js"></script>
 <script>
+/* ===========================================================
+   EventPay — Contribute page logic
+   Razorpay Checkout only. No QR / UPI code.
+   =========================================================== */
+
+// ---- Global state (declared once) ----
+let userData = {};
+let eventName = "Event";
+let villages = [];
 
 const QUICK_AMTS = [101, 251, 501, 1001, 2001, 5001];
 
-// Build quick amount buttons
+// ---- DOM references (declared once, before any function uses them) ----
+const nameIn     = document.getElementById("name");
+const villageIn  = document.getElementById("village");
+const phoneIn    = document.getElementById("phone");
+const amountIn   = document.getElementById("amount");
+const proceedBtn = document.getElementById("proceedBtn");
+
+// ---- Quick amount buttons ----
 QUICK_AMTS.forEach(a => {
   const b = document.createElement("button");
-  b.className = "aq-btn"; b.textContent = "₹"+a.toLocaleString("en-IN");
-  b.onclick = () => { document.getElementById("amount").value = a; document.querySelectorAll(".aq-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); validate(); };
+  b.className = "aq-btn";
+  b.textContent = "₹" + a.toLocaleString("en-IN");
+  b.onclick = () => {
+    amountIn.value = a;
+    document.querySelectorAll(".aq-btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    validate();
+  };
   document.getElementById("amountQuick").appendChild(b);
 });
 
+// ---- Initial data load ----
 Promise.all([
-  fetch(APP_CONFIG.SCRIPT_URL+"?action=getSettings").then(r=>r.json()).catch(()=>({})),
-  fetch(APP_CONFIG.SCRIPT_URL+"?action=getPublicVisibility").then(r=>r.json()).catch(()=>({})),
-  fetch(APP_.SCRIPT_URL+"?action=getPublicStats").then(r=>r.json()).catch(()=>({})),
-  fetch(APP_.SCRIPT_URL+"?action=getVillageSuggestions").then(r=>r.json()).catch(()=>({villages:[]})),
-  fetch(APP_.SCRIPT_URL+"?action=getRecentTransactions").then(r=>r.json()).catch(()=>({transactions:[]}))
-]).then(([settings, vis, stats, vsug, rtx])=>{
-  upiID = settings.UPI_ID || APP_CONFIG.UPI_ID || "";
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings").then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicVisibility").then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats").then(r => r.json()).catch(() => ({})),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getVillageSuggestions").then(r => r.json()).catch(() => ({ villages: [] })),
+  fetch(APP_CONFIG.SCRIPT_URL + "?action=getRecentTransactions").then(r => r.json()).catch(() => ({ transactions: [] }))
+]).then(([settings, vis, stats, vsug, rtx]) => {
   eventName = settings.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
   document.getElementById("eventTitle").textContent = eventName;
   document.getElementById("navEventName").textContent = eventName;
   document.title = eventName + " — Contribute";
-  if(vis.showStatistics !== false){
-    document.getElementById("counterSection").style.display="block";
-    document.getElementById("totalAmount").textContent = "₹"+Number(stats.total||0).toLocaleString("en-IN");
-    document.getElementById("totalCount").textContent = Number(stats.count||0).toLocaleString("en-IN");
+
+  if (vis.showStatistics !== false) {
+    document.getElementById("counterSection").style.display = "block";
+    document.getElementById("totalAmount").textContent = "₹" + Number(stats.total || 0).toLocaleString("en-IN");
+    document.getElementById("totalCount").textContent = Number(stats.count || 0).toLocaleString("en-IN");
   }
-  if(vis.showDonorList !== false) document.getElementById("qaaDonors").style.removeProperty("display");
-  if(vis.showInviteCard !== false) document.getElementById("qaaInvite").style.removeProperty("display");
-  if(vis.showGallery !== false) document.getElementById("qaaGallery").style.removeProperty("display");
+  if (vis.showDonorList !== false) document.getElementById("qaaDonors").style.removeProperty("display");
+  if (vis.showInviteCard !== false) document.getElementById("qaaInvite").style.removeProperty("display");
+  if (vis.showGallery !== false) document.getElementById("qaaGallery").style.removeProperty("display");
+
   villages = vsug.villages || [];
-  // Recent transactions
-  const txs = (rtx.transactions||[]).slice(0,5);
-  if(vis.showRecentPayments !== false && txs.length){
-    document.getElementById("recentSection").style.display="block";
-    document.getElementById("recentList").innerHTML = txs.map(t=>`
+
+  const txs = (rtx.transactions || []).slice(0, 5);
+  if (vis.showRecentPayments !== false && txs.length) {
+    document.getElementById("recentSection").style.display = "block";
+    document.getElementById("recentList").innerHTML = txs.map(t => `
       <div class="rtx-item">
-        <div><div class="rtx-name">${t.name}</div><div class="rtx-village">📍 ${t.village||""}</div></div>
-        <div style="text-align:right"><div class="rtx-amount">₹${Number(t.amount||0).toLocaleString("en-IN")}</div><div class="rtx-date">${t.date||""}</div></div>
+        <div><div class="rtx-name">${t.name}</div><div class="rtx-village">📍 ${t.village || ""}</div></div>
+        <div style="text-align:right"><div class="rtx-amount">₹${Number(t.amount || 0).toLocaleString("en-IN")}</div><div class="rtx-date">${t.date || ""}</div></div>
       </div>`).join("");
   }
-  // MAX_AMOUNT from settings
-  if(settings.MAX_AMOUNT && Number(settings.MAX_AMOUNT)>0){
+
+  if (settings.MAX_AMOUNT && Number(settings.MAX_AMOUNT) > 0) {
     APP_CONFIG.MAX_AMOUNT = Number(settings.MAX_AMOUNT);
-    document.getElementById("amount").setAttribute("max", APP_CONFIG.MAX_AMOUNT);
+    amountIn.setAttribute("max", APP_CONFIG.MAX_AMOUNT);
   }
-  if(settings.MIN_AMOUNT && Number(settings.MIN_AMOUNT)>0){
+  if (settings.MIN_AMOUNT && Number(settings.MIN_AMOUNT) > 0) {
     APP_CONFIG.MIN_AMOUNT = Number(settings.MIN_AMOUNT);
   }
 });
 
-// VILLAGE AUTOCOMPLETE
-function filterVillageDD(q){
-  const box=document.getElementById("villageDD");
-  if(!q||q.length<2){box.classList.remove("open");return;}
-  const m=villages.filter(v=>v.toLowerCase().includes(q.toLowerCase())).slice(0,7);
-  if(!m.length){box.classList.remove("open");return;}
-  box.innerHTML=m.map(v=>`<div class="vd-item" onclick="selectVD('${v.replace(/'/g,"\\'")}')">📍 ${v}</div>`).join('');
+// ---- Village autocomplete ----
+function filterVillageDD(q) {
+  const box = document.getElementById("villageDD");
+  if (!q || q.length < 2) { box.classList.remove("open"); return; }
+  const m = villages.filter(v => v.toLowerCase().includes(q.toLowerCase())).slice(0, 7);
+  if (!m.length) { box.classList.remove("open"); return; }
+  box.innerHTML = m.map(v => `<div class="vd-item" onclick="selectVD('${v.replace(/'/g, "\\'")}')">📍 ${v}</div>`).join('');
   box.classList.add("open");
 }
-function selectVD(v){document.getElementById("village").value=v;closeVDD();validate();}
-function closeVDD(){document.getElementById("villageDD").classList.remove("open");}
+function selectVD(v) { villageIn.value = v; closeVDD(); validate(); }
+function closeVDD() { document.getElementById("villageDD").classList.remove("open"); }
 
-// UTR RISK
-function checkUTRRisk(val){
-  clearTimeout(utrCheckTimer);
-  const bar=document.getElementById("utrRiskBar"),lbl=document.getElementById("utrRiskLabel");
-  if(!val||val.length<8){bar.classList.remove("show");return;}
-  utrCheckTimer=setTimeout(()=>{
-    fetch(APP_CONFIG.SCRIPT_URL+"?action=validateUTR&utr="+encodeURIComponent(val)+"&phone="+(document.getElementById("phone")?.value||""))
-    .then(r=>r.json()).then(d=>{
-      bar.classList.add("show");
-      if(d.risk==="LOW") lbl.innerHTML='<span class="badge badge-verified">✅ Low Risk</span> UTR looks valid';
-      else if(d.risk==="MEDIUM") lbl.innerHTML='<span class="badge badge-review">⚠️ Medium Risk</span> '+(d.flags[0]||"");
-      else lbl.innerHTML='<span class="badge badge-notverified">❌ High Risk</span> '+(d.flags[0]||"");
-    }).catch(()=>{});
-  },600);
-}
+// ---- Form validation ----
+function validate() {
+  let ok = true;
 
-// VALIDATION
-const nameIn=document.getElementById("name"),villageIn=document.getElementById("village"),
-      phoneIn=document.getElementById("phone"),amountIn=document.getElementById("amount"),
-      proceedBtn=document.getElementById("proceedBtn");
-function validate(){
-  let ok=true;
-  const nOk=/^[A-Za-z ]{2,}$/.test(nameIn.value.trim());
-  nameIn.classList.toggle("invalid",!nOk&&nameIn.value.trim()); nameIn.classList.toggle("valid",nOk);
-  document.getElementById("nameErr").classList.toggle("show",!nOk&&nameIn.value.trim());
-  if(!nOk)ok=false;
-  const vOk=villageIn.value.trim().length>=2;
-  villageIn.classList.toggle("invalid",!vOk&&villageIn.value.trim()); villageIn.classList.toggle("valid",vOk);
-  document.getElementById("villageErr").classList.toggle("show",!vOk&&villageIn.value.trim());
-  if(!vOk)ok=false;
-  const pOk=/^[6-9]\d{9}$/.test(phoneIn.value.trim());
-  phoneIn.classList.toggle("invalid",!pOk&&phoneIn.value.trim()); phoneIn.classList.toggle("valid",pOk);
-  document.getElementById("phoneErr").classList.toggle("show",!pOk&&phoneIn.value.trim());
-  if(!pOk)ok=false;
-  const amt=Number(amountIn.value), min=APP_CONFIG.MIN_AMOUNT||50, max=APP_CONFIG.MAX_AMOUNT||0;
-  const aOk=amt>=min&&(max===0||amt<=max);
-  amountIn.classList.toggle("invalid",!aOk&&amountIn.value); amountIn.classList.toggle("valid",aOk);
-  let amtMsg="Enter a valid amount (min ₹"+min+")";
-  if(max>0&&amt>max) amtMsg="Maximum contribution is ₹"+max.toLocaleString("en-IN");
-  document.getElementById("amountErr").textContent=amtMsg;
-  document.getElementById("amountErr").classList.toggle("show",!aOk&&amountIn.value);
-  if(!aOk)ok=false;
-  proceedBtn.disabled=!ok;
-}
-nameIn.addEventListener("input",validate); villageIn.addEventListener("input",validate);
-phoneIn.addEventListener("input",()=>{ phoneIn.value=phoneIn.value.replace(/\D/g,"").slice(0,10); validate(); });
-amountIn.addEventListener("input",validate);
+  const nOk = /^[A-Za-z ]{2,}$/.test(nameIn.value.trim());
+  nameIn.classList.toggle("invalid", !nOk && nameIn.value.trim());
+  nameIn.classList.toggle("valid", nOk);
+  document.getElementById("nameErr").classList.toggle("show", !nOk && nameIn.value.trim());
+  if (!nOk) ok = false;
 
-function generateRefID(){return "EP"+Date.now().toString().slice(-10);}
-function setStep(n){[1,2,3].forEach(i=>{const e=document.getElementById("step"+i);e.classList.remove("active","done");if(i<n)e.classList.add("done");if(i===n)e.classList.add("active");});}
+  const vOk = villageIn.value.trim().length >= 2;
+  villageIn.classList.toggle("invalid", !vOk && villageIn.value.trim());
+  villageIn.classList.toggle("valid", vOk);
+  document.getElementById("villageErr").classList.toggle("show", !vOk && villageIn.value.trim());
+  if (!vOk) ok = false;
 
-function goToPayment(){
-  userData={refid:generateRefID(),name:nameIn.value.trim(),village:villageIn.value.trim(),phone:phoneIn.value.trim(),amount:amountIn.value.trim()};
-  upiLink=`upi://pay?pa=${upiID}&pn=${encodeURIComponent(userData.name)}&am=${userData.amount}&cu=INR&tn=${userData.refid}`;
-  document.getElementById("formSection").style.display="none";
-  document.getElementById("paymentSection").style.display="block";
-  document.getElementById("amountBadge").textContent="₹"+Number(userData.amount).toLocaleString("en-IN");
-  document.getElementById("qrcode").innerHTML="";
-  new QRCode(document.getElementById("qrcode"),{text:upiLink,width:200,height:200});
-  setStep(2); window.scrollTo({top:0,behavior:"smooth"});
-}
-function backToForm(){document.getElementById("paymentSection").style.display="none";document.getElementById("formSection").style.display="block";setStep(1);}
-function openUPI(app){
-  const links={phonepe:`phonepe://pay?pa=${upiID}&pn=${encodeURIComponent(userData.name)}&am=${userData.amount}&cu=INR&tn=${userData.refid}`,gpay:`tez://upi/pay?pa=${upiID}&pn=${encodeURIComponent(userData.name)}&am=${userData.amount}&cu=INR&tn=${userData.refid}`,paytm:`paytmmp://pay?pa=${upiID}&pn=${encodeURIComponent(userData.name)}&am=${userData.amount}&cu=INR&tn=${userData.refid}`,bhim:upiLink};
-  window.location.href=links[app]||upiLink; setTimeout(()=>window.location.href=upiLink,2000);
-}
-function showMsg(id,type,text){const el=document.getElementById(id);el.className="msg-box show "+type;el.innerHTML=(type==="success"?"✅":type==="error"?"❌":type==="warning"?"⚠️":"ℹ️")+" "+text;}
-function showProgress(){const pb=document.getElementById("progressBar"),pf=document.getElementById("progressFill");pb.style.display="block";pf.style.width="0%";setTimeout(()=>pf.style.width="40%",100);setTimeout(()=>pf.style.width="75%",2000);}
-function completeProgress(){document.getElementById("progressFill").style.width="100%";setTimeout(()=>document.getElementById("progressBar").style.display="none",500);}
+  const pOk = /^[6-9]\d{9}$/.test(phoneIn.value.trim());
+  phoneIn.classList.toggle("invalid", !pOk && phoneIn.value.trim());
+  phoneIn.classList.toggle("valid", pOk);
+  document.getElementById("phoneErr").classList.toggle("show", !pOk && phoneIn.value.trim());
+  if (!pOk) ok = false;
 
-function finishPayment(){
-  const utr=document.getElementById("utr").value.trim();
-  if(!utr||utr.length<8){showMsg("payMsg","error","Please enter a valid UTR / Transaction ID (minimum 8 digits).");return;}
-  document.getElementById("finishBtn").disabled=true; showProgress();
-  const data=new URLSearchParams({action:"insertPayment",refid:userData.refid,name:userData.name,village:userData.village,phone:userData.phone,amount:userData.amount,utr});
-  fetch(APP_CONFIG.SCRIPT_URL,{method:"POST",body:data}).then(r=>r.json()).then(res=>{
-    completeProgress(); document.getElementById("finishBtn").disabled=false;
-    if(res.result==="Inserted"){
-      if(res.riskLevel==="MEDIUM") toast("⚠️ Payment submitted for review.","warning");
-      showMsg("payMsg","success","Payment submitted!"); setTimeout(()=>showReceipt(utr),600);
-    } else if(res.result==="DuplicatePhone") showMsg("payMsg","error","This phone number already has a payment record.");
-    else if(res.result==="DuplicateUTR") showMsg("payMsg","error","❌ Duplicate UTR — already submitted.");
-    else if(res.result==="AmountExceedsMax") showMsg("payMsg","error",res.message||"Amount exceeds maximum.");
-    else if(res.result==="AmountBelowMin") showMsg("payMsg","error",res.message||"Amount below minimum.");
-    else showMsg("payMsg","error","Server error. Please try again.");
-  }).catch(()=>{completeProgress();document.getElementById("finishBtn").disabled=false;showMsg("payMsg","error","Connection error. Please retry.");});
-}
+  const amt = Number(amountIn.value), min = APP_CONFIG.MIN_AMOUNT || 50, max = APP_CONFIG.MAX_AMOUNT || 0;
+  const aOk = amt >= min && (max === 0 || amt <= max);
+  amountIn.classList.toggle("invalid", !aOk && amountIn.value);
+  amountIn.classList.toggle("valid", aOk);
+  let amtMsg = "Enter a valid amount (min ₹" + min + ")";
+  if (max > 0 && amt > max) amtMsg = "Maximum contribution is ₹" + max.toLocaleString("en-IN");
+  document.getElementById("amountErr").textContent = amtMsg;
+  document.getElementById("amountErr").classList.toggle("show", !aOk && amountIn.value);
+  if (!aOk) ok = false;
 
-function showReceipt(utr){
-  document.getElementById("paymentSection").style.display="none";
-  document.getElementById("receiptSection").style.display="block"; setStep(3);
-  const now=new Date();
-  document.getElementById("r_org").textContent=APP_CONFIG.ORG_NAME||"Organisation";
-  document.getElementById("r_event").textContent=eventName;
-  document.getElementById("r_name").textContent=userData.name;
-  document.getElementById("r_village").textContent=userData.village;
-  document.getElementById("r_phone").textContent=userData.phone;
-  document.getElementById("r_amount").textContent="₹"+Number(userData.amount).toLocaleString("en-IN");
-  document.getElementById("r_utr").textContent=utr;
-  document.getElementById("r_refid").textContent=userData.refid;
-  document.getElementById("r_datetime").textContent=now.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})+" "+now.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("r_gentime").textContent=now.toLocaleString("en-IN");
-  window.scrollTo({top:0,behavior:"smooth"});
+  proceedBtn.disabled = !ok;
 }
-function downloadReceipt(){
-  html2canvas(document.getElementById("receipt"),{scale:2,backgroundColor:"#fff",useCORS:true}).then(canvas=>{
-    const a=document.createElement("a"); a.download="receipt_"+userData.refid+".png"; a.href=canvas.toDataURL("image/png"); a.click();
+nameIn.addEventListener("input", validate);
+villageIn.addEventListener("input", validate);
+phoneIn.addEventListener("input", () => { phoneIn.value = phoneIn.value.replace(/\D/g, "").slice(0, 10); validate(); });
+amountIn.addEventListener("input", validate);
+
+// ---- Helpers ----
+function generateRefID() { return "EP" + Date.now().toString().slice(-10); }
+
+function setStep(n) {
+  [1, 2, 3].forEach(i => {
+    const e = document.getElementById("step" + i);
+    e.classList.remove("active", "done");
+    if (i < n) e.classList.add("done");
+    if (i === n) e.classList.add("active");
   });
 }
 
-function toggleNav(){document.getElementById("navMobile").classList.toggle("open");}
-function toggleTheme(){
-  const c=document.documentElement.getAttribute('data-theme')||'dark',n=c==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n);
-  document.getElementById('themeToggle').textContent=n==='dark'?'☀️ Light':'🌙 Dark';
-  const m=document.getElementById('themeToggleMob');if(m)m.textContent=n==='dark'?'☀️':'🌙';
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  el.className = "msg-box show " + type;
+  el.innerHTML = (type === "success" ? "✅" : type === "error" ? "❌" : type === "warning" ? "⚠️" : "ℹ️") + " " + text;
 }
-window.addEventListener('DOMContentLoaded',()=>{
-  const t=document.documentElement.getAttribute('data-theme')||'dark';
-  document.getElementById('themeToggle').textContent=t==='dark'?'☀️ Light':'🌙 Dark';
-  if(window.innerWidth<=640){const m=document.getElementById('themeToggleMob');if(m){m.style.display='block';m.textContent=t==='dark'?'☀️':'🌙';}}
+
+function showProgress() {
+  const pb = document.getElementById("progressBar"), pf = document.getElementById("progressFill");
+  pb.style.display = "block"; pf.style.width = "0%";
+  setTimeout(() => pf.style.width = "40%", 100);
+  setTimeout(() => pf.style.width = "75%", 2000);
+}
+function completeProgress() {
+  document.getElementById("progressFill").style.width = "100%";
+  setTimeout(() => document.getElementById("progressBar").style.display = "none", 500);
+}
+
+// ---- STEP 1 -> STEP 2: create the Razorpay order server-side, then show the Pay button ----
+function goToPayment() {
+  userData = {
+    refid: generateRefID(),
+    name: nameIn.value.trim(),
+    village: villageIn.value.trim(),
+    phone: phoneIn.value.trim(),
+    amount: amountIn.value.trim()
+  };
+
+  document.getElementById("formSection").style.display = "none";
+  document.getElementById("paymentSection").style.display = "block";
+  document.getElementById("amountBadge").textContent = "₹" + Number(userData.amount).toLocaleString("en-IN");
+  document.getElementById("payNowAmt").textContent = Number(userData.amount).toLocaleString("en-IN");
+  setStep(2);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const payBtn = document.getElementById("payNowBtn");
+  payBtn.disabled = true;
+  showProgress();
+
+  const params = new URLSearchParams({
+    action: "createRazorpayOrder",
+    eventCode: getEventCode(),
+    amount: userData.amount,
+    name: userData.name,
+    village: userData.village,
+    phone: userData.phone
+  });
+
+  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
+    .then(r => r.json())
+    .then(res => {
+      completeProgress();
+      payBtn.disabled = false;
+      if (res.error) {
+        showMsg("payMsg", "error", res.error);
+        return;
+      }
+      userData.orderId = res.orderId;
+      userData.razorpayKeyId = res.keyId;
+      userData.orderAmount = res.amount; // paise
+    })
+    .catch(() => {
+      completeProgress();
+      payBtn.disabled = false;
+      showMsg("payMsg", "error", "Could not start payment. Please try again.");
+    });
+}
+
+// ---- STEP 2: open Razorpay's own Checkout popup ----
+function openRazorpayCheckout() {
+  if (!userData.orderId) {
+    showMsg("payMsg", "error", "Payment session not ready yet. Please wait a moment and try again.");
+    return;
+  }
+  const emailField = document.getElementById("email");
+  const options = {
+    key: userData.razorpayKeyId,       // public Key ID only — no secret ever touches the browser
+    amount: userData.orderAmount,
+    currency: "INR",
+    name: eventName,
+    description: "Contribution — " + userData.name,
+    order_id: userData.orderId,
+    prefill: {
+      name: userData.name,
+      contact: userData.phone,
+      email: emailField ? emailField.value : ""
+    },
+    theme: { color: "#6366f1" },
+    handler: function (response) {
+      // response = { razorpay_payment_id, razorpay_order_id, razorpay_signature }
+      confirmPaymentWithServer(response);
+    },
+    modal: {
+      ondismiss: function () {
+        showMsg("payMsg", "warning", "Payment window closed. You can try again anytime.");
+      }
+    }
+  };
+  const rzp = new Razorpay(options);
+  rzp.on("payment.failed", function (resp) {
+    showMsg("payMsg", "error", "Payment failed: " + (resp.error && resp.error.description || "please try again"));
+  });
+  rzp.open();
+}
+
+// ---- After the popup succeeds, ask the server to independently verify ----
+function confirmPaymentWithServer(response) {
+  const payBtn = document.getElementById("payNowBtn");
+  payBtn.disabled = true;
+  showProgress();
+  showMsg("payMsg", "info", "Confirming your payment...");
+
+  const params = new URLSearchParams({
+    action: "verifyPayment",
+    eventCode: getEventCode(),
+    razorpay_order_id: response.razorpay_order_id,
+    razorpay_payment_id: response.razorpay_payment_id,
+    razorpay_signature: response.razorpay_signature
+  });
+
+  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
+    .then(r => r.json())
+    .then(res => {
+      completeProgress();
+      payBtn.disabled = false;
+      if (res.success) {
+        showMsg("payMsg", "success", "Payment confirmed!");
+        setTimeout(() => showReceipt(response.razorpay_payment_id), 500);
+      } else {
+        showMsg("payMsg", "error", res.error || "We couldn't confirm this payment. Contact support with your name and phone number — do not pay again.");
+      }
+    })
+    .catch(() => {
+      completeProgress();
+      payBtn.disabled = false;
+      showMsg("payMsg", "error", "Connection error while confirming payment. If money was deducted, contact support — do not pay again.");
+    });
+}
+
+function backToForm() {
+  document.getElementById("paymentSection").style.display = "none";
+  document.getElementById("formSection").style.display = "block";
+  setStep(1);
+}
+
+function showReceipt(paymentId) {
+  document.getElementById("paymentSection").style.display = "none";
+  document.getElementById("receiptSection").style.display = "block";
+  setStep(3);
+  const now = new Date();
+  document.getElementById("r_org").textContent = APP_CONFIG.ORG_NAME || "Organisation";
+  document.getElementById("r_event").textContent = eventName;
+  document.getElementById("r_name").textContent = userData.name;
+  document.getElementById("r_village").textContent = userData.village;
+  document.getElementById("r_phone").textContent = userData.phone;
+  document.getElementById("r_amount").textContent = "₹" + Number(userData.amount).toLocaleString("en-IN");
+  document.getElementById("r_utr").textContent = paymentId;
+  document.getElementById("r_refid").textContent = userData.refid;
+  document.getElementById("r_datetime").textContent =
+    now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) + " " +
+    now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  document.getElementById("r_gentime").textContent = now.toLocaleString("en-IN");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function downloadReceipt() {
+  html2canvas(document.getElementById("receipt"), { scale: 2, backgroundColor: "#fff", useCORS: true }).then(canvas => {
+    const a = document.createElement("a");
+    a.download = "receipt_" + userData.refid + ".png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  });
+}
+
+// ---- Nav / theme ----
+function toggleNav() { document.getElementById("navMobile").classList.toggle("open"); }
+function toggleTheme() {
+  const c = document.documentElement.getAttribute('data-theme') || 'dark', n = c === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem('theme', n);
+  document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️ Light' : '🌙 Dark';
+  const m = document.getElementById('themeToggleMob');
+  if (m) m.textContent = n === 'dark' ? '☀️' : '🌙';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const t = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+  if (window.innerWidth <= 640) {
+    const m = document.getElementById('themeToggleMob');
+    if (m) { m.style.display = 'block'; m.textContent = t === 'dark' ? '☀️' : '🌙'; }
+  }
 });
-function toast(msg,type="info"){
-  const tc=document.getElementById("toastContainer");const t=document.createElement("div");
-  t.className="toast "+type;t.textContent=msg;tc.appendChild(t);
-  setTimeout(()=>{t.classList.add("fade-out");setTimeout(()=>t.remove(),300);},3500);
-}
 </script>
 <script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </body>
