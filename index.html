@@ -191,14 +191,28 @@
 </div>
 
 <div class="page-content">
-  <div class="steps-bar" id="stepsBar">
+  <!-- EVENT CODE GATE — shown first, before any event data is loaded -->
+  <div id="eventGateSection">
+    <div class="card">
+      <div class="card-title"><div class="icon">🔑</div>Enter Event Code</div>
+      <div class="form-group">
+        <label class="form-label">Event Code</label>
+        <input class="form-input" type="text" id="eventCodeInput" placeholder="e.g. WED25001" autocomplete="off" style="text-transform:uppercase">
+        <div class="field-error" id="eventCodeErr">Enter a valid event code</div>
+      </div>
+      <div id="gateMsg" class="msg-box"></div>
+      <button class="proceed-btn" id="openEventBtn" onclick="openEvent()">Open Event →</button>
+    </div>
+  </div>
+
+  <div class="steps-bar" id="stepsBar" style="display:none">
     <div class="step-item active" id="step1"><div class="step-circle">1</div><span class="step-label">Details</span></div>
     <div class="step-item" id="step2"><div class="step-circle">2</div><span class="step-label">Payment</span></div>
     <div class="step-item" id="step3"><div class="step-circle">✓</div><span class="step-label">Receipt</span></div>
   </div>
 
   <!-- FORM -->
-  <div id="formSection">
+  <div id="formSection" style="display:none">
     <div class="card">
       <div class="card-title"><div class="icon">👤</div>Your Details</div>
       <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="name" placeholder="Enter your full name" autocomplete="name"><div class="field-error" id="nameErr">Enter a valid name (letters only)</div></div>
@@ -314,70 +328,109 @@ QUICK_AMTS.forEach(a => {
   document.getElementById("amountQuick").appendChild(b);
 });
 
-// ---- Initial data load ----
-// eventCode is the multi-tenant routing key withEvent() uses to find this
-// event's spreadsheet in MASTER_DB. It must come from the ?event= link the
-// organizer shared, or (on later visits) from localStorage.
-const CURRENT_EVENT_CODE = getEventCode();
+// ---- Event Code gate ----
+// CURRENT_EVENT_CODE is set ONLY after the backend confirms this code exists
+// and is active in MASTER_DB (via getSettings). No ?event= URL param, no
+// getEventCode(), no localStorage is read on initial load.
+let CURRENT_EVENT_CODE = null;
 
-if (!CURRENT_EVENT_CODE) {
-  document.getElementById("formSection").innerHTML =
-    '<div class="card"><div class="card-title"><div class="icon">⚠️</div>Event link required</div>' +
-    '<p style="font-size:13px;color:var(--text-muted)">This page needs an event link to know which event to contribute to. ' +
-    'Please use the contribution link shared by the organizer (it looks like <code>index.html?event=WED26001</code>).</p></div>';
-  document.getElementById("proceedBtn") && (document.getElementById("proceedBtn").style.display = "none");
-  throw new Error("Missing event code — aborting page init");
+const eventCodeInput = document.getElementById("eventCodeInput");
+const openEventBtn   = document.getElementById("openEventBtn");
+
+eventCodeInput.addEventListener("keydown", e => { if (e.key === "Enter") openEvent(); });
+eventCodeInput.addEventListener("input", () => {
+  document.getElementById("eventCodeErr").classList.remove("show");
+});
+
+// STEP 2 -> STEP 3: POST getSettings with the entered code. The backend's
+// withEvent()/findEventByCode() does the real validation against MASTER_DB.
+function openEvent() {
+  const code = eventCodeInput.value.trim().toUpperCase();
+  const errEl = document.getElementById("eventCodeErr");
+  if (!code) {
+    errEl.textContent = "Enter a valid event code";
+    errEl.classList.add("show");
+    return;
+  }
+
+  openEventBtn.disabled = true;
+  showMsg("gateMsg", "info", "Checking event code...");
+
+  const params = new URLSearchParams({ action: "getSettings", eventCode: code });
+
+  fetch(APP_CONFIG.SCRIPT_URL, { method: "POST", body: params })
+    .then(r => r.json())
+    .then(settings => {
+      if (settings.error) {
+        openEventBtn.disabled = false;
+        showMsg("gateMsg", "error", settings.error);
+        return;
+      }
+      // STEP 3: validated — lock in the event code.
+      CURRENT_EVENT_CODE = code;
+      loadEventData(settings);
+    })
+    .catch(() => {
+      openEventBtn.disabled = false;
+      showMsg("gateMsg", "error", "Could not reach the server. Please try again.");
+    });
 }
 
-const EC_QS = "&eventCode=" + encodeURIComponent(CURRENT_EVENT_CODE);
+// STEP 4: only after validation, load the rest of the event's public data.
+function loadEventData(settings) {
+  const EC_QS = "&eventCode=" + encodeURIComponent(CURRENT_EVENT_CODE);
 
-Promise.all([
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getSettings" + EC_QS).then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicVisibility" + EC_QS).then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats" + EC_QS).then(r => r.json()).catch(() => ({})),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getVillageSuggestions" + EC_QS).then(r => r.json()).catch(() => ({ villages: [] })),
-  fetch(APP_CONFIG.SCRIPT_URL + "?action=getRecentTransactions" + EC_QS).then(r => r.json()).catch(() => ({ transactions: [] }))
-]).then(([settings, vis, stats, vsug, rtx]) => {
-  if (settings.error) { showMsg("payMsg", "error", settings.error); return; }
+  Promise.all([
+    Promise.resolve(settings), // already fetched during validation, reused here
+    fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicVisibility" + EC_QS).then(r => r.json()).catch(() => ({})),
+    fetch(APP_CONFIG.SCRIPT_URL + "?action=getPublicStats" + EC_QS).then(r => r.json()).catch(() => ({})),
+    fetch(APP_CONFIG.SCRIPT_URL + "?action=getVillageSuggestions" + EC_QS).then(r => r.json()).catch(() => ({ villages: [] })),
+    fetch(APP_CONFIG.SCRIPT_URL + "?action=getRecentTransactions" + EC_QS).then(r => r.json()).catch(() => ({ transactions: [] }))
+  ]).then(([settings, vis, stats, vsug, rtx]) => {
+    eventName = settings.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
+    document.getElementById("eventTitle").textContent = eventName;
+    document.getElementById("navEventName").textContent = eventName;
+    document.title = eventName + " — Contribute";
 
-  // Cache the resolved code so donors.html / status.html / gallery.html
-  // (which read the same localStorage key) keep working without ?event= on every link.
-  setEventCode(CURRENT_EVENT_CODE);
+    if (vis.showStatistics !== false) {
+      document.getElementById("counterSection").style.display = "block";
+      document.getElementById("totalAmount").textContent = "₹" + Number(stats.total || 0).toLocaleString("en-IN");
+      document.getElementById("totalCount").textContent = Number(stats.count || 0).toLocaleString("en-IN");
+    }
+    if (vis.showDonorList !== false) document.getElementById("qaaDonors").style.removeProperty("display");
+    if (vis.showInviteCard !== false) document.getElementById("qaaInvite").style.removeProperty("display");
+    if (vis.showGallery !== false) document.getElementById("qaaGallery").style.removeProperty("display");
 
-  eventName = settings.EventName || APP_CONFIG.EVENT_NAME || "EventPay";
-  document.getElementById("eventTitle").textContent = eventName;
-  document.getElementById("navEventName").textContent = eventName;
-  document.title = eventName + " — Contribute";
+    villages = vsug.villages || [];
 
-  if (vis.showStatistics !== false) {
-    document.getElementById("counterSection").style.display = "block";
-    document.getElementById("totalAmount").textContent = "₹" + Number(stats.total || 0).toLocaleString("en-IN");
-    document.getElementById("totalCount").textContent = Number(stats.count || 0).toLocaleString("en-IN");
-  }
-  if (vis.showDonorList !== false) document.getElementById("qaaDonors").style.removeProperty("display");
-  if (vis.showInviteCard !== false) document.getElementById("qaaInvite").style.removeProperty("display");
-  if (vis.showGallery !== false) document.getElementById("qaaGallery").style.removeProperty("display");
+    const txs = (rtx.transactions || []).slice(0, 5);
+    if (vis.showRecentPayments !== false && txs.length) {
+      document.getElementById("recentSection").style.display = "block";
+      document.getElementById("recentList").innerHTML = txs.map(t => `
+        <div class="rtx-item">
+          <div><div class="rtx-name">${t.name}</div><div class="rtx-village">📍 ${t.village || ""}</div></div>
+          <div style="text-align:right"><div class="rtx-amount">₹${Number(t.amount || 0).toLocaleString("en-IN")}</div><div class="rtx-date">${t.date || ""}</div></div>
+        </div>`).join("");
+    }
 
-  villages = vsug.villages || [];
+    if (settings.MAX_AMOUNT && Number(settings.MAX_AMOUNT) > 0) {
+      APP_CONFIG.MAX_AMOUNT = Number(settings.MAX_AMOUNT);
+      amountIn.setAttribute("max", APP_CONFIG.MAX_AMOUNT);
+    }
+    if (settings.MIN_AMOUNT && Number(settings.MIN_AMOUNT) > 0) {
+      APP_CONFIG.MIN_AMOUNT = Number(settings.MIN_AMOUNT);
+    }
 
-  const txs = (rtx.transactions || []).slice(0, 5);
-  if (vis.showRecentPayments !== false && txs.length) {
-    document.getElementById("recentSection").style.display = "block";
-    document.getElementById("recentList").innerHTML = txs.map(t => `
-      <div class="rtx-item">
-        <div><div class="rtx-name">${t.name}</div><div class="rtx-village">📍 ${t.village || ""}</div></div>
-        <div style="text-align:right"><div class="rtx-amount">₹${Number(t.amount || 0).toLocaleString("en-IN")}</div><div class="rtx-date">${t.date || ""}</div></div>
-      </div>`).join("");
-  }
-
-  if (settings.MAX_AMOUNT && Number(settings.MAX_AMOUNT) > 0) {
-    APP_CONFIG.MAX_AMOUNT = Number(settings.MAX_AMOUNT);
-    amountIn.setAttribute("max", APP_CONFIG.MAX_AMOUNT);
-  }
-  if (settings.MIN_AMOUNT && Number(settings.MIN_AMOUNT) > 0) {
-    APP_CONFIG.MIN_AMOUNT = Number(settings.MIN_AMOUNT);
-  }
-});
+    // STEP 5: hide the code gate, reveal the event name + contribution form.
+    openEventBtn.disabled = false;
+    document.getElementById("eventGateSection").style.display = "none";
+    document.getElementById("stepsBar").style.display = "";
+    document.getElementById("formSection").style.display = "block";
+  }).catch(() => {
+    openEventBtn.disabled = false;
+    showMsg("gateMsg", "error", "Could not load event data. Please try again.");
+  });
+}
 
 // ---- Village autocomplete ----
 function filterVillageDD(q) {
@@ -461,12 +514,10 @@ function completeProgress() {
 
 // ---- STEP 1 -> STEP 2: create the Razorpay order server-side, then show the Pay button ----
 function goToPayment() {
-  // Fail fast rather than silently sending eventCode="null" to the backend,
-  // which withEvent() would reject with "Event not found: NULL" and
-  // createRazorpayOrder() would never actually run.
-  const eventCode = CURRENT_EVENT_CODE || getEventCode();
-  if (!eventCode) {
-    showMsg("payMsg", "error", "Missing event reference. Please reload using the original contribution link.");
+  // By the time formSection is visible, CURRENT_EVENT_CODE has already been
+  // validated against MASTER_DB by openEvent(). This is a defensive check only.
+  if (!CURRENT_EVENT_CODE) {
+    showMsg("payMsg", "error", "Event session lost. Please reload and re-enter the event code.");
     return;
   }
 
@@ -491,7 +542,7 @@ function goToPayment() {
 
   const params = new URLSearchParams({
     action: "createRazorpayOrder",
-    eventCode: eventCode,
+    eventCode: CURRENT_EVENT_CODE,
     amount: userData.amount,
     name: userData.name,
     village: userData.village,
@@ -564,7 +615,7 @@ function confirmPaymentWithServer(response) {
 
   const params = new URLSearchParams({
     action: "verifyPayment",
-    eventCode: CURRENT_EVENT_CODE || getEventCode(),
+    eventCode: CURRENT_EVENT_CODE,
     razorpay_order_id: response.razorpay_order_id,
     razorpay_payment_id: response.razorpay_payment_id,
     razorpay_signature: response.razorpay_signature
