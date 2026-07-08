@@ -44,6 +44,10 @@ async function loadCurrentEvent() {
     settings: data.settings
   };
 
+  if (CURRENT_EVENT.settings && CURRENT_EVENT.settings['Theme']) {
+    document.documentElement.setAttribute('data-theme', CURRENT_EVENT.settings['Theme']);
+  }
+
   sessionStorage.setItem(CONFIG.STORAGE_KEY, CURRENT_EVENT.eventCode);
   return CURRENT_EVENT;
 }
@@ -116,6 +120,7 @@ const NAV_ITEMS = [
   { page: 'home.html',    toggle: null,              icon: '🏠', label: 'Home',    desc: 'Event overview' },
   { page: 'donors.html',  toggle: 'Show Donors',      icon: '🎁', label: 'Donors',  desc: 'See who\u2019s contributed' },
   { page: 'gallery.html', toggle: 'Show Gallery',     icon: '📷', label: 'Gallery', desc: 'Photos from the day' },
+  { page: 'invite.html',  toggle: 'Show Invite',      icon: '💌', label: 'Invite',  desc: 'Your invitation' },
   { page: 'status.html',  toggle: 'Show Complaints',  icon: '📋', label: 'Status',  desc: 'Track a request' },
   { page: 'support.html', toggle: null,              icon: '💬', label: 'Support', desc: 'Get help' },
   { page: 'admin.html',   toggle: null,              icon: '🔑', label: 'Admin',   desc: 'Organizer login' }
