@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invitation · EventPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="lights" aria-hidden="true">
+    <svg viewBox="0 0 800 64" preserveAspectRatio="none">
+      <path d="M0,8 C 100,50 200,50 300,8 S 500,50 600,8 S 800,50 800,8"
+            fill="none" stroke="#cda355" stroke-opacity="0.35" stroke-width="1.5"/>
+      <g fill="#e6c580">
+        <circle class="bulb" cx="30"  cy="14" r="3.5"/>
+        <circle class="bulb" cx="90"  cy="30" r="3.5"/>
+        <circle class="bulb" cx="150" cy="38" r="3.5"/>
+        <circle class="bulb" cx="210" cy="30" r="3.5"/>
+        <circle class="bulb" cx="270" cy="14" r="3.5"/>
+        <circle class="bulb" cx="330" cy="14" r="3.5"/>
+        <circle class="bulb" cx="390" cy="30" r="3.5"/>
+        <circle class="bulb" cx="450" cy="38" r="3.5"/>
+        <circle class="bulb" cx="510" cy="30" r="3.5"/>
+        <circle class="bulb" cx="570" cy="14" r="3.5"/>
+        <circle class="bulb" cx="630" cy="14" r="3.5"/>
+        <circle class="bulb" cx="690" cy="30" r="3.5"/>
+        <circle class="bulb" cx="750" cy="38" r="3.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <nav class="topnav">
+    <span class="topnav__brand">EventPay</span>
+    <div class="topnav__links" id="topnavLinks"></div>
+  </nav>
+
+  <main class="invite-page">
+
+    <!-- Loading -->
+    <p class="skeleton" id="inviteLoading">Loading invitation…</p>
+
+    <!-- Invitation -->
+    <section id="inviteContent" hidden>
+
+      <div class="invitation-card">
+        <div class="invitation-card__inner">
+          <p class="invitation-card__eyebrow" id="inviteEyebrow">You're invited</p>
+          <h1 class="invitation-card__names" id="inviteNames">&nbsp;</h1>
+          <p class="invitation-card__meta" id="inviteParents" hidden></p>
+          <p class="invitation-card__meta" id="inviteDate" hidden></p>
+          <p class="invitation-card__meta" id="inviteVenue" hidden></p>
+          <div class="invitation-card__actions">
+            <a class="btn-secondary" id="mapBtn" href="#" target="_blank" rel="noopener" hidden>Open in Maps</a>
+            <button type="button" class="btn-secondary" id="calendarBtn" hidden>Add to Calendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Venue map -->
+      <section class="card invite-panel" id="mapPanel" hidden style="max-width:480px;margin:22px auto;">
+        <p class="contribute-card__label">Venue</p>
+        <iframe class="map-embed" id="mapEmbed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </section>
+
+      <!-- QR + share -->
+      <section class="card invite-panel qr-box" style="max-width:380px;margin:22px auto;">
+        <p class="contribute-card__label">Share this invitation</p>
+        <img id="qrImage" alt="QR code to this event" width="180" height="180">
+        <p class="footnote" style="margin-top:10px;">Scan to open this page, or share a link below</p>
+        <div class="share-row">
+          <button type="button" class="btn-secondary" id="shareWhatsappBtn">WhatsApp</button>
+          <button type="button" class="btn-secondary" id="copyLinkBtn">Copy Link</button>
+          <button type="button" class="btn-secondary" id="nativeShareBtn" hidden>Share</button>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/invite.js"></script>
+</body>
+</html>
