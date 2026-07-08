@@ -9,7 +9,7 @@
 const CONFIG = {
   // Paste your deployed Apps Script Web App URL here.
   // Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone
-  API_URL: 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE',
+  API_URL: 'https://script.google.com/macros/s/AKfycbwMZ6MBtAg-9oB_vMMn_ITf8FFVX17z3h-FubJp12Wec8Bljt5ZTpTA8iZ7s2AZ1JJ5/exec',
 
   APP_NAME: 'EventPay',
 
