@@ -6,18 +6,23 @@
  * ------------------------------------------------------------------
  */
 
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   // ── Tab state ────────────────────────────────────────────────────
   let activeTab = 'code'; // 'code' | 'name'
 
+  // All DOM queries are inside DOMContentLoaded so elements exist
   const tabCodeBtn   = document.getElementById('tabCode');
   const tabNameBtn   = document.getElementById('tabName');
   const searchLabel  = document.getElementById('searchLabel');
   const searchInput  = document.getElementById('searchInput');
   const searchForm   = document.getElementById('searchForm');
   const resultsList  = document.getElementById('resultsList');
+
+  // Guard: if any required element is missing this script is on the
+  // wrong page — bail out silently instead of throwing null errors.
+  if (!tabCodeBtn || !searchForm) return;
 
   // ── Tab switching ────────────────────────────────────────────────
   function setTab(tab) {
@@ -117,4 +122,4 @@
     });
   }
 
-})();
+});
