@@ -6,7 +6,7 @@
 <title>Admin · EventPay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -39,44 +39,34 @@
 
   <main class="admin-page">
 
-    <!-- Login -->
-    <section class="card contribute-card" id="adminLoginCard" style="max-width:380px;margin:20px auto;">
-      <p class="contribute-card__label">Organizer login</p>
-      <form id="adminLoginForm" novalidate>
-        <div class="field">
-          <label for="adminUsername">Username</label>
-          <input type="text" id="adminUsername" autocomplete="username" required>
-        </div>
-        <div class="field">
-          <label for="adminPassword">Password</label>
-          <input type="password" id="adminPassword" autocomplete="current-password" required>
-        </div>
-        <button type="submit" id="adminLoginBtn" class="btn-primary">Log in</button>
-      </form>
-    </section>
-
-    <!-- Dashboard -->
-    <section id="adminDashboard" hidden>
+    <section id="adminDashboard">
       <div class="admin-topbar">
         <span id="adminWelcome"></span>
+        <span id="sessionClock" class="footnote" style="margin:0;"></span>
         <button type="button" class="btn-secondary" id="adminLogoutBtn">Log out</button>
       </div>
 
       <div class="admin-tabs" id="adminTabs">
-        <button type="button" class="admin-tab is-active" data-tab="complaints">Complaints</button>
+        <button type="button" class="admin-tab is-active" data-tab="dashboard">Dashboard</button>
+        <button type="button" class="admin-tab" data-tab="payments">Payments</button>
+        <button type="button" class="admin-tab" data-tab="complaints">Complaints</button>
         <button type="button" class="admin-tab" data-tab="gallery">Gallery</button>
         <button type="button" class="admin-tab" data-tab="villages">Villages</button>
-        <button type="button" class="admin-tab" data-tab="settings">Settings</button>
         <button type="button" class="admin-tab" data-tab="analytics">Analytics</button>
-        <button type="button" class="admin-tab" data-tab="payments">Payments</button>
+        <button type="button" class="admin-tab" data-tab="settings">Settings</button>
+        <button type="button" class="admin-tab" data-tab="admins">Admins</button>
+        <button type="button" class="admin-tab" data-tab="audit">Audit Log</button>
       </div>
 
-      <div class="admin-panel" id="panel-complaints"></div>
+      <div class="admin-panel" id="panel-dashboard"></div>
+      <div class="admin-panel" id="panel-payments" hidden></div>
+      <div class="admin-panel" id="panel-complaints" hidden></div>
       <div class="admin-panel" id="panel-gallery" hidden></div>
       <div class="admin-panel" id="panel-villages" hidden></div>
-      <div class="admin-panel" id="panel-settings" hidden></div>
       <div class="admin-panel" id="panel-analytics" hidden></div>
-      <div class="admin-panel" id="panel-payments" hidden></div>
+      <div class="admin-panel" id="panel-settings" hidden></div>
+      <div class="admin-panel" id="panel-admins" hidden></div>
+      <div class="admin-panel" id="panel-audit" hidden></div>
     </section>
   </main>
 
