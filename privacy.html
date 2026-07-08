@@ -219,7 +219,7 @@
 <footer class="footer"><p>🛡️ Privacy Policy · <a href="terms.html" class="text-link">Terms</a> · <a href="contact.html" class="text-link">Contact</a></p></footer>
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="config.js"></script>
+<script src="js/config.js"></script>
 <script>
 fetch(APP_CONFIG.SCRIPT_URL+"?action=getSettings").then(r=>r.json()).then(s=>{
   const n=s.EventName||APP_CONFIG.EVENT_NAME||"EventPay";
