@@ -28,7 +28,7 @@ function renderGalleryTitle() {
 }
 
 async function refreshGallery() {
-  const data = await api('getGallery', { eventCode: CURRENT_EVENT.eventCode });
+  const data = await api('getGalleryImages', { eventCode: CURRENT_EVENT.eventCode });
   document.getElementById('galleryCount').textContent =
     `${data.count} photo${data.count === 1 ? '' : 's'}`;
   renderGalleryGrid(data.photos);
